@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>免責事項 · URSUS</title>
+  <meta name="description" content="URSUS を使用する際の免責事項・注意事項について。カーネルレベルの動作を含むソフトウェアとしてのリスクを説明します。">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body class="h-full bg-slate-50 antialiased"
+  style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <!-- Mobile overlay -->
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <!-- ── Sidebar ──────────────────────────────────────────────── -->
+    <aside id="sidebar"
+      class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="index.html"
+        class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="assets/ursus_logo.png" alt="URSUS" class="h-8 w-auto">
+        <span
+          class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="index.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">URSUSとは</a></li>
+            <li><a href="quickstart.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">インストールと実行</a>
+            </li>
+            <li><a href="architecture.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">アーキテクチャ</a>
+            </li>
+            <li><a href="disclaimer.html"
+                class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">免責事項</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="sensors/mechanisms.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Sensor の仕組み</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="detector/pipeline.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Detector の仕組み</a>
+            </li>
+            <li><a href="detector/rules.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Koguma ルールの定義</a></li>
+            <li><a href="detector/responses.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">レスポンス動作</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="operations.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">設定の変更</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">
+        URSUS · MIT License
+      </div>
+    </aside>
+
+    <!-- ── Content area ─────────────────────────────────────────── -->
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <!-- Mobile header -->
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()"
+          class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label="メニューを開く">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <a href="index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1>免責事項</h1>
+<p class="subtitle">URSUS を安全にご利用いただくために、以下の事項を必ずお読みください</p>
+
+<h2 id="overview">はじめに</h2>
+<p>
+  URSUS（以下「本ソフトウェア」）は、セキュリティ学習を目的として開発されたオープンソースの軽量 EDR です。
+  本ソフトウェアは MIT ライセンスのもとで提供されており、<strong>「現状のまま（AS IS）」</strong>の状態で配布されています。
+  ご利用に際しては、以下の免責事項をご確認いただき、内容にご同意の上でご使用ください。
+</p>
+
+<h2 id="warranty">保証の否認</h2>
+<p>
+  本ソフトウェアは<strong>いかなる種類の保証も伴わずに提供されます</strong>。
+  これには、商品性、特定目的への適合性、および権利非侵害に関する暗黙の保証を含みますが、これに限定されません。
+  開発者は、本ソフトウェアの使用によって生じた直接的・間接的・偶発的な損害について、
+  一切の責任を負いません。
+</p>
+
+<h2 id="kernel-level">カーネルレベルの動作について</h2>
+<p>
+  URSUS は EDR としての性質上、Linux カーネルに近い領域で動作するコンポーネントを含みます。
+  具体的には、以下のカーネルインタフェースを利用します。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>コンポーネント</th><th>利用する仕組み</th><th>必要な権限</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>Process Collector</td>
+  <td><code>cn_proc</code> netlink ソケット</td>
+  <td><code>CAP_NET_ADMIN</code> または root</td>
+</tr>
+<tr>
+  <td>File Collector</td>
+  <td><code>inotify</code>（watchdog 経由）</td>
+  <td>監視対象ディレクトリの読み取り権限</td>
+</tr>
+<tr>
+  <td>Network Collector</td>
+  <td><code>/proc/net/tcp</code> ポーリング</td>
+  <td>一般ユーザー権限</td>
+</tr>
+<tr>
+  <td>Auth Collector</td>
+  <td><code>journalctl</code> 子プロセス</td>
+  <td><code>systemd-journal</code> グループまたは root</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>
+  これらの動作にはカーネルとの密接なインタラクションが含まれるため、
+  潜在的なバグや予期しない動作により、<strong>稼働中のシステムに悪影響を与える可能性がゼロではありません</strong>。
+  特に以下のようなリスクが考えられます。
+</p>
+
+<ul>
+  <li><strong>リソース消費</strong>: netlink ソケットからのイベントが大量に発生した場合、CPU やメモリの使用量が増大する可能性があります。</li>
+  <li><strong>inotify ウォッチ上限</strong>: ファイル監視対象が多い場合、カーネルの <code>fs.inotify.max_user_watches</code> 上限に達し、他のアプリケーションに影響する場合があります。</li>
+  <li><strong>レスポンス動作の副作用</strong>: プロセス停止（kill）やファイル隔離（quarantine）などのレスポンスアクションが有効な場合、誤検知によって正当なプロセスやファイルに影響を与える可能性があります。</li>
+  <li><strong>ディスク使用量</strong>: SQLite データベースへのイベント書き込みが継続するため、ディスク容量を徐々に消費します。</li>
+</ul>
+
+<div class="warn">
+<strong>必ず仮想マシン上でご使用ください</strong>
+<p>
+  本ソフトウェアは学習用途として設計されています。
+  ホスト OS 上や本番環境での直接実行は推奨しません。
+  VirtualBox、VMware、QEMU/KVM などの仮想環境上で動作させることを強く推奨します。
+</p>
+</div>
+
+<h2 id="purpose">利用目的の制限</h2>
+<p>
+  URSUS はセキュリティの学習および理解を深めるために設計されています。
+  以下の利用は本ソフトウェアの意図された目的の<strong>範囲外</strong>です。
+</p>
+
+<ul>
+  <li><strong>本番環境での使用</strong>: URSUS は商用 EDR の代替として機能するように設計されていません。本番の業務システムを保護する目的で使用しないでください。</li>
+  <li><strong>第三者への攻撃</strong>: URSUS の検知ルールや動作原理の学習を、許可なく第三者のシステムに対する攻撃に利用することは法律で禁止されています。</li>
+  <li><strong>高可用性の要求</strong>: URSUS にはフェイルオーバー機構やクラスタリング機能は含まれていません。中断なく稼働し続ける保証はありません。</li>
+</ul>
+
+<h2 id="security">セキュリティに関する注意</h2>
+<p>
+  本ソフトウェアの Web UI には<strong>認証機能が実装されていません</strong>。
+  既定ではループバックアドレス（<code>127.0.0.1</code>）にバインドされますが、
+  設定を変更して外部ネットワークからアクセス可能にした場合、
+  認証なしでイベントデータやアラート情報が閲覧可能になります。
+</p>
+
+<div class="warn">
+<strong>UIを外部に公開しないでください</strong>
+<p>
+  <code>ui.host</code> を <code>0.0.0.0</code> に変更すると、同一ネットワーク上の全てのホストから
+  URSUS の UI にアクセスできるようになります。これにはセキュリティ上のリスクが伴いますので、
+  必要がない限りデフォルトのループバック設定を変更しないでください。
+</p>
+</div>
+
+<h2 id="data">データの取り扱い</h2>
+<p>
+  URSUS が収集するイベントデータには、プロセスのコマンドライン引数、ファイルパス、
+  ネットワーク接続先、認証ログなどの<strong>機密性の高い情報が含まれる場合があります</strong>。
+  これらのデータはローカルの SQLite データベースに保存されます。
+</p>
+
+<ul>
+  <li>データベースファイルへのアクセス権限を適切に管理してください。</li>
+  <li>不要になったデータは速やかに削除してください。</li>
+  <li>データベースファイルを外部に共有する際は、機密情報が含まれていないか確認してください。</li>
+</ul>
+
+<h2 id="bugs">バグと不具合について</h2>
+<p>
+  本ソフトウェアはオープンソースプロジェクトであり、完全に動作することを保証するものではありません。
+  バグや不具合を発見した場合は、GitHub の Issue トラッカーを通じて報告いただけると幸いです。
+  ただし、報告された問題の修正は最善の努力に基づいて行われ、修正の時期や提供を保証するものではありません。
+</p>
+
+<h2 id="license">ライセンス</h2>
+<p>
+  本ソフトウェアは <strong>MIT License</strong> のもとで公開されています。
+  MIT ライセンスでは、ソフトウェアは「現状のまま」提供され、いかなる保証も明示的・暗黙的を問わず含まれません。
+  詳細はプロジェクトルートの <code>LICENSE</code> ファイルをご確認ください。
+</p>
+
+<pre><code>MIT License
+
+Copyright (c) URSUS Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</code></pre>
+
+<h2 id="contact">お問い合わせ</h2>
+<p>
+  本ソフトウェアに関するご質問やご懸念がございましたら、
+  GitHub リポジトリの Issue または Discussions をご利用ください。
+</p>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+          </article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+
+</html>

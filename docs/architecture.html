@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>アーキテクチャ · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <aside id="sidebar"
+      class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="index.html"
+        class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="assets/ursus_logo.png" alt="URSUS" class="h-8 w-auto">
+        <span
+          class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="index.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">URSUSとは</a></li>
+            <li><a href="quickstart.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">インストールと実行</a>
+            </li>
+            <li><a href="architecture.html"
+                class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">アーキテクチャ</a>
+            </li>
+            <li><a href="disclaimer.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">免責事項</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="sensors/mechanisms.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Sensor の仕組み</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="detector/pipeline.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Detector の仕組み</a>
+            </li>
+            <li><a href="detector/rules.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Koguma ルールの定義</a></li>
+            <li><a href="detector/responses.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">レスポンス動作</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="operations.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">設定の変更</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">
+        URSUS · MIT License
+      </div>
+    </aside>
+
+    <!-- ── Content area ─────────────────────────────────────────── -->
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <!-- Mobile header -->
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()"
+          class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label="メニューを開く">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <a href="index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1>アーキテクチャ</h1>
+<p class="subtitle">3 プロセス分離と SQLite データバスによる疎結合構成</p>
+
+<h2 id="overview">全体像</h2>
+
+<div class="diagram">
+<pre>
+   ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+   │  ursus-sensor   │    │ ursus-detector  │    │    ursus-ui     │
+   │                 │    │                 │    │                 │
+   │ ┌─────────────┐ │    │ ┌─────────────┐ │    │  FastAPI        │
+   │ │ process     │ │    │ │ rule loader │ │    │  Jinja2 TPL     │
+   │ │ (netlink)   │ │    │ └─────────────┘ │    │  127.0.0.1:8080 │
+   │ └─────────────┘ │    │ ┌─────────────┐ │    │                 │
+   │ ┌─────────────┐ │    │ │ engine      │ │    │  /              │
+   │ │ file        │ │    │ │ ├─ eval     │ │    │  /events        │
+   │ │ (inotify)   │ │    │ │ └─ alert!   │ │    │  /alerts/&lt;id&gt;   │
+   │ └─────────────┘ │    │ └─────────────┘ │    │  /process-tree  │
+   │ ┌─────────────┐ │    │ ┌─────────────┐ │    │                 │
+   │ │ network     │ │    │ │ response    │ │    │                 │
+   │ │ (psutil)    │ │    │ │ handler     │ │    │                 │
+   │ └─────────────┘ │    │ └─────────────┘ │    │                 │
+   │ ┌─────────────┐ │    │                 │    │                 │
+   │ │ auth        │ │    │                 │    │                 │
+   │ │ (journalctl)│ │    │                 │    │                 │
+   │ └─────────────┘ │    │                 │    │                 │
+   └────────┬────────┘    └────────┬────────┘    └────────┬────────┘
+            │                      │                      │
+            │ INSERT events        │ SELECT events &gt; ckpt │ SELECT
+            │                      │ INSERT alerts        │ events / alerts
+            │                      │ INSERT response_log  │
+            └──────────────────────┴──────────────────────┘
+                              ▼
+                    ┌────────────────────┐
+                    │  data/edr.db       │
+                    │  SQLite (WAL mode) │
+                    │  ─ events          │
+                    │  ─ alerts          │
+                    │  ─ response_log    │
+                    │  ─ detector_state  │
+                    └────────────────────┘
+</pre>
+</div>
+
+<p>
+3 つのプロセスは互いに直接通信せず、SQLite ファイルを <strong>データバス</strong>として
+使います。Sensor はイベント監視と SQLite への記録のみを行い、Detector は SQLite から読み出したイベントを Koguma で評価し、アラートを
+SQLite に記録します。UI は記録されたイベントとアラートを SQLite より抽出し、画面へ表示します。WAL モード有効化により、複数プロセスからの
+同時アクセスでもブロックしません。
+</p>
+
+<h2 id="data-flow">データフロー</h2>
+
+<div class="diagram">
+<pre>
+  カーネル                Sensor                    DB                   Detector
+  ────────                ──────                    ──                   ────────
+
+  exec(2) ──netlink──&gt; process_collector ──INSERT──&gt; events
+                                                       │
+                                                       │ poll loop
+                                                       │ (1s)
+                                                       ▼
+                                              SELECT * FROM events
+                                              WHERE id &gt; checkpoint
+                                                       │
+                                                       ▼
+                                              eval_condition(rule, event)
+                                                       │
+                                                       │ if match
+                                                       ▼
+                                              INSERT alerts ────────────&gt; UI
+                                              INSERT response_log
+</pre>
+<p class="diagram-caption">プロセス起動を例にしたエンドツーエンドのフロー</p>
+</div>
+
+<h3 id="data-flow-detail">手順を分解</h3>
+<ol>
+  <li><strong>カーネル → Sensor</strong>:
+    プロセス起動なら <code>cn_proc</code> netlink、ファイル変更なら inotify、
+    認証ログなら journald が、ユーザ空間に push 通知します。</li>
+  <li><strong>Sensor → DB</strong>:
+    通知を受け取った Sensor は <code>events</code> 表に 1 行 INSERT。
+    raw_json には Linux API から取れた生データ全てを格納し、検知に使う重要
+    フィールドだけを非正規化カラム（pid, process_name, file_path 等）に
+    展開します。</li>
+  <li><strong>Detector → DB</strong>:
+    Detector は 1 秒間隔のポーリングで「checkpoint より新しい events」を SELECT。
+    各イベントについて、event_type が一致するルール群を順に評価します。</li>
+  <li><strong>マッチ → アラート</strong>:
+    ルールの condition が true になったら <code>alerts</code> 表に INSERT。
+    続いて ResponseHandler が <code>response_log</code> に対応アクションを記録
+    （dry_run なら実行はしない）。</li>
+  <li><strong>UI</strong>:
+    ブラウザは FastAPI に GET し、events / alerts を SELECT して
+    Jinja2 でレンダリング。ダッシュボード、検索、アラート詳細、プロセスツリー。</li>
+</ol>
+
+<h2 id="schema">DB スキーマ</h2>
+<p>
+URSUS の全データモデルは <a href="https://www.sqlite.org/" target="_blank" rel="noopener">SQLite</a> の
+4 テーブルに収まります。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>テーブル</th><th>役割</th><th>書き手</th><th>読み手</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>events</code></td>
+  <td>Sensor が観測した生イベント。raw_json + 非正規化カラム</td>
+  <td>Sensor</td>
+  <td>Detector / UI</td>
+</tr>
+<tr>
+  <td><code>alerts</code></td>
+  <td>Detector がルールマッチで生成した検知結果</td>
+  <td>Detector</td>
+  <td>UI</td>
+</tr>
+<tr>
+  <td><code>response_log</code></td>
+  <td>各アラートに紐づくレスポンス実行ログ</td>
+  <td>Detector (ResponseHandler)</td>
+  <td>UI</td>
+</tr>
+<tr>
+  <td><code>detector_state</code></td>
+  <td>評価チェックポイント (last_evaluated_event_id)</td>
+  <td>Detector</td>
+  <td>Detector</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="events-schema"><code>events</code> 表の構造</h3>
+<pre><code><span class="tk-kw">CREATE TABLE</span> events (
+  <span class="tk-com">-- 共通</span>
+  id            <span class="tk-typ">INTEGER PRIMARY KEY AUTOINCREMENT</span>,
+  timestamp     <span class="tk-typ">REAL NOT NULL</span>,
+  event_type    <span class="tk-typ">TEXT NOT NULL</span> <span class="tk-kw">CHECK</span>(event_type <span class="tk-kw">IN</span> (<span class="tk-str">'process'</span>,<span class="tk-str">'file'</span>,<span class="tk-str">'network'</span>,<span class="tk-str">'auth'</span>)),
+  hostname      <span class="tk-typ">TEXT NOT NULL</span>,
+  raw_json      <span class="tk-typ">TEXT NOT NULL</span>,            <span class="tk-com">-- センサが取れた全データ</span>
+
+  <span class="tk-com">-- 検索・検知用の非正規化カラム</span>
+  pid                  <span class="tk-typ">INTEGER</span>,
+  ppid                 <span class="tk-typ">INTEGER</span>,
+  user                 <span class="tk-typ">TEXT</span>,
+  process_name         <span class="tk-typ">TEXT</span>,
+  parent_process_name  <span class="tk-typ">TEXT</span>,
+  cmdline              <span class="tk-typ">TEXT</span>,
+  exe_path             <span class="tk-typ">TEXT</span>,
+  file_path            <span class="tk-typ">TEXT</span>,
+  file_op              <span class="tk-typ">TEXT</span>,             <span class="tk-com">-- create/modify/delete/move</span>
+  remote_addr          <span class="tk-typ">TEXT</span>,
+  remote_port          <span class="tk-typ">INTEGER</span>,
+  local_port           <span class="tk-typ">INTEGER</span>,
+  conn_state           <span class="tk-typ">TEXT</span>,             <span class="tk-com">-- LISTEN / ESTABLISHED 等</span>
+  auth_user            <span class="tk-typ">TEXT</span>,
+  auth_result          <span class="tk-typ">TEXT</span>,             <span class="tk-com">-- success / failure / sudo</span>
+  source_ip            <span class="tk-typ">TEXT</span>
+);</code></pre>
+
+<p>
+<strong>非正規化カラム</strong>とは、本来 raw_json に入っているフィールドを「検索効率のため」
+別カラムにコピーしたものです。これにより:
+</p>
+<ul>
+  <li>SQL で <code>WHERE process_name = 'bash'</code> のようなインデックス付き検索ができる</li>
+  <li>UI が raw_json をパースせずに表形式で表示できる</li>
+  <li>Detector のルール評価時に JSON パースを毎回しなくて済む</li>
+</ul>
+<p>
+ルール DSL の <code>field</code> には、この非正規化カラム名か <code>raw.&lt;key&gt;</code> 形式
+（raw_json 内の任意フィールド）のどちらでも指定できます。
+</p>
+
+<h2 id="threading">プロセスとスレッド</h2>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>プロセス</th><th>スレッド構成</th><th>備考</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>ursus-sensor</code></td>
+  <td>main + 4 collector スレッド + watchdog Observer の emitter スレッド群</td>
+  <td>各 collector は独自の DB 接続を保持。SIGTERM で stop_event を共有して終了。</td>
+</tr>
+<tr>
+  <td><code>ursus-detector</code></td>
+  <td>main + engine スレッド (実質 1 スレッド)</td>
+  <td>シンプルなポーリングループ。再入や排他は不要。</td>
+</tr>
+<tr>
+  <td><code>ursus-ui</code></td>
+  <td>uvicorn + FastAPI ワーカー</td>
+  <td>各リクエストごとに DB 接続を開いて閉じる。</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="why-sqlite">なぜ SQLite か</h2>
+<p>
+データバスとして PostgreSQL や Redis を使うこともできますが、URSUS は学習可能性を
+優先して SQLite を選びました。
+</p>
+<ul>
+  <li><strong>外部依存ゼロ</strong>: Python 標準ライブラリだけで動き、別プロセスのデーモンが不要</li>
+  <li><strong>1 ファイル = 1 セッション</strong>: <code>data/edr.db</code> をコピー / 削除すれば状態がリセット</li>
+  <li><strong>WAL モードで多プロセス読み取り可</strong>: 1 writer + N readers の構成と相性が良い</li>
+  <li><strong>外部ツールでの直接検査</strong>: <code>sqlite3 data/edr.db</code> から生クエリを投げて状態を直接観察できる</li>
+</ul>
+
+<div class="info">
+<strong>SQL を直接叩いて遊ぶ</strong>
+<pre><code>$ sqlite3 data/edr.db
+sqlite&gt; .schema events
+sqlite&gt; SELECT event_type, COUNT(*) FROM events GROUP BY event_type;
+sqlite&gt; SELECT process_name, cmdline FROM events
+   ...&gt; WHERE event_type = 'process' AND timestamp &gt; strftime('%s','now') - 60
+   ...&gt; ORDER BY timestamp DESC LIMIT 20;</code></pre>
+</div>
+
+<h2 id="next">関連ドキュメント</h2>
+<ul>
+  <li><a href="sensors/mechanisms.html">Sensor の仕組み</a> — 各コレクタの技術詳細と実装方式</li>
+  <li><a href="detector/pipeline.html">Detector の仕組み</a> — checkpoint 駆動の評価ループ</li>
+  <li><a href="detector/rules.html">検知ルールの定義</a> — YAML で書ける検知条件の文法</li>
+</ul>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+
+          </article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

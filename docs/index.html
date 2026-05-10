@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>URSUS — Micro EDR for Education</title>
+  <meta name="description" content="URSUSは仮想マシン上のセキュリティ学習向けに設計された軽量EDR。ログ収集の仕組みとアラート発火ロジックを読める粒度で実装。">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body class="h-full bg-slate-50 antialiased"
+  style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <!-- Mobile overlay -->
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <!-- ── Sidebar ──────────────────────────────────────────────── -->
+    <aside id="sidebar"
+      class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="index.html"
+        class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="assets/ursus_logo.png" alt="URSUS" class="h-8 w-auto">
+        <span
+          class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="index.html"
+                class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">URSUSとは</a></li>
+            <li><a href="quickstart.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">インストールと実行</a>
+            </li>
+            <li><a href="architecture.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">アーキテクチャ</a>
+            </li>
+            <li><a href="disclaimer.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">免責事項</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="sensors/mechanisms.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Sensor の仕組み</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="detector/pipeline.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Detector の仕組み</a>
+            </li>
+            <li><a href="detector/rules.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Koguma ルールの定義</a></li>
+            <li><a href="detector/responses.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">レスポンス動作</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="operations.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">設定の変更</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">
+        URSUS · MIT License
+      </div>
+    </aside>
+
+    <!-- ── Content area ─────────────────────────────────────────── -->
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <!-- Mobile header -->
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()"
+          class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label="メニューを開く">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <a href="index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10 ">
+          <img src="assets/ursus_logo.png" alt="URSUS" style="max-height:64px;margin-bottom:0.75rem">
+
+          <article>
+            <h2 id="what-is-ursus">URSUS（ウルサス） とは</h2>
+            <p>
+              URSUS は Python で実装されたセキュリティ学習向けの簡素な EDR（Endpoint Detection and Response） で、
+              EDR が端末上でどのように動作し、どのように振る舞うのかを明確にするため、
+              役割ごとに分離された複数のコンポーネントが連動するよう設計されています。<br>
+              またコード全体を読み解くことで Linux におけるイベント収集のアプローチを学ぶことができ、実際のEDRの動作を理解するためのヒントを得ることができます。
+              動作も簡素ながら実際の EDR を模倣しているため、仮想マシン上での検証やハッキング手法の実践を試すための実用ツールとしても使用可能です。
+            </p>
+
+            <img src="assets/image_dashboard.png" alt="URSUS Dashboard"
+              style="max-width:100%;height:auto;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.12);margin:2rem 0">
+
+            <h3>主な特徴</h3>
+            <p>
+              URSUS は以下のような特徴を持っており、安心して学習に使用できます。
+            </p>
+            <div class="cards">
+              <a class="card" href="sensors/mechanisms.html">
+                <h3>4つのセンサー</h3>
+                <p>Linux が標準で備える仕組みを利用し、デバイス上のイベントとしてプロセス / ファイル / ネットワーク / 認証の4フィールドに対するログを収集します。</p>
+              </a>
+              <a class="card" href="detector/rules.html">
+                <h3>宣言的ルール</h3>
+                <p>YAML で記述する条件式（Koguma）を独自エンジンで評価する、簡素なアラートトリガー方式を採用。
+                  コード変更なしで自由にルールを追加することができます。</p>
+              </a>
+              <a class="card" href="detector/responses.html">
+                <h3>制限付きレスポンス</h3>
+                <p>レスポンス動作はアラート / プロセス停止 / ファイル隔離の3つ。
+                  既定で全てDry-Runモードなので、誤検知による実害を抑制できるため学習に最適です。</p>
+              </a>
+              <a class="card" href="architecture.html">
+                <h3>コンポーネント分離</h3>
+                <p>イベントを監視する「Sensor」、アラートをトリガーする「Detector」、ダッシュボードを提供する「UI」 が独立コンポーネントとして動作します。</p>
+              </a>
+              <a class="card">
+                <h3>シンプルなUI</h3>
+                <p>URSUS の UI は非常にシンプルな設計となっており、端末上のイベントやトリガーされたアラートが簡単に確認できます。</p>
+              </a>
+            </div>
+            <h2>試してみる</h2>
+            <p>URSUS は
+            <a href="https://github.com/akinosora501/ursus-micro-edr">
+              GitHub
+            </a>
+            からダウンロードできます。</p>
+
+            <h2 id="who">こんな人向け</h2>
+            <ul>
+              <li><strong>EDR の中身を理解したいセキュリティ学習者</strong>:
+                netlink、inotify、auditd、eBPF などの Linux 観測 API がどう違うのか、
+                どんなトレードオフがあるのか、実際のコードと出力で確かめられます。</li>
+              <li><strong>仮想 VM 上で攻撃シナリオを練習する学習者</strong>:
+                URSUS を被害者ホストに常駐させ、HackTheBox / TryHackMe / 自作シナリオ等で
+                攻撃が「どう見えるか」を生のイベントログで観察できます。</li>
+              <li><strong>SOC アナリスト志望</strong>:
+                商用 EDR で見ていた "process tree" や "alert detail" が、
+                どんな低レイヤ情報から組み立てられているかを手元で体験できます。</li>
+            </ul>
+
+            <h2 id="not-this">URSUS にできないこと</h2>
+            <div class="warn">
+              <strong>本番運用には使わないでください</strong>
+              <p>URSUS は学習用です。商用 EDR が持つ以下の機能は、明示的にスコープ外です:</p>
+              <ul>
+                <li>マルチホスト / Server-Agent 構成</li>
+                <li>リアルタイム性の保証（ポーリング由来の取りこぼしあり）</li>
+                <li>EDR 自己防衛（root 権限攻撃者からの保護）</li>
+                <li>署名検証付きアップデート機構</li>
+                <li>SOC 運用ワークフロー連携（チケット、SOAR 等）</li>
+                <li>Web UI 認証（ループバック束縛で代替）</li>
+              </ul>
+            </div>
+
+            <h2 id="next">次に読む</h2>
+            <p>
+              URSUS の全体像を掴むなら <a href="architecture.html">Architecture</a>、
+              すぐ動かしたいなら <a href="quickstart.html">Quick Start</a>、
+              個別のセンサーが Linux のどの仕組みを使っているのかを深掘りするなら
+              <a href="sensors/mechanisms.html">センサーの仕組み</a> から順に進むのがおすすめです。
+            </p>
+
+            <footer class="docs-footer">
+              <span>URSUS Micro EDR · MIT License</span>
+              <span>
+                <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+              </span>
+            </footer>
+          </article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+
+</html>

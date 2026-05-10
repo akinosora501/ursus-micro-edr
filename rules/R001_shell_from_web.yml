@@ -1,0 +1,17 @@
+id: R001
+title: Webサーバー配下からのシェル起動
+description: nginx / apache / php-fpm から bash 等が起動された場合、Webアプリ経由のRCEの兆候。
+severity: high
+event_type: process
+condition:
+  all:
+    - field: process_name
+      op: in
+      value: [bash, sh, dash, zsh, ash]
+    - field: parent_process_name
+      op: in
+      value: [nginx, apache2, httpd, php-fpm]
+response:
+  - alert
+mitre:
+  - T1059.004

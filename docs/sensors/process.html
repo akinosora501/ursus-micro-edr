@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Process Collector · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="../index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="../assets/ursus_logo.png" alt="URSUS" class="h-7 w-auto">
+        <span class="text-white font-bold text-sm tracking-wide">URSUS</span>
+        <span class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../index.html"        class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Introduction</a></li>
+            <li><a href="../quickstart.html"   class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Quick Start</a></li>
+            <li><a href="../architecture.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Architecture</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="process.html" class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">Process Collector</a></li>
+            <li><a href="file.html"    class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">File Collector</a></li>
+            <li><a href="network.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Network Collector</a></li>
+            <li><a href="auth.html"    class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Auth Collector</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../detector/pipeline.html"  class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Pipeline</a></li>
+            <li><a href="../detector/rules.html"     class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Rules DSL</a></li>
+            <li><a href="../detector/responses.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Responses</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../operations.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Operations</a></li>
+            <li><a href="../glossary.html"   class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Glossary</a></li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">URSUS · MIT License</div>
+    </aside>
+
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100" aria-label="メニュー">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a href="../index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="../assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1><span class="tag-pill process">process</span> Process Collector</h1>
+<p class="subtitle">netlink (cn_proc) でプロセス起動をカーネルから push 通知で受け取る</p>
+
+<h2 id="goal">目的</h2>
+
+<p>
+URSUS が観測する <strong>4 つのイベントタイプの中で最も重要</strong>なのが
+プロセス起動です。攻撃者の行動はほぼ必ず「何かのプロセスを起動する」という
+形で表面化します。シェル、payload バイナリ、永続化のための cron タスク、
+横展開の psexec — 全てプロセス起動として観測できます。
+</p>
+
+<h2 id="approach">採用方式: cn_proc netlink</h2>
+
+<p>
+プロセス起動を観測する Linux 上の選択肢は複数あります。URSUS は
+<strong>kernel から直接 push 通知を受ける</strong>方式を採用しています。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>方式</th><th>取りこぼし</th><th>必要権限</th><th>備考</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>cn_proc netlink (採用)</strong></td>
+  <td>なし</td>
+  <td>CAP_NET_ADMIN</td>
+  <td>カーネルが exec(2) のたびに通知。リアルタイム</td>
+</tr>
+<tr>
+  <td>psutil ポーリング</td>
+  <td>あり (poll 間隔より短命)</td>
+  <td>不要</td>
+  <td>DESIGN.md の初版方針。実装簡単だが取りこぼし大</td>
+</tr>
+<tr>
+  <td>auditd</td>
+  <td>なし</td>
+  <td>root</td>
+  <td>execve syscall を audit ルールで購読。出力フォーマットが煩雑</td>
+</tr>
+<tr>
+  <td>eBPF (kprobe)</td>
+  <td>なし</td>
+  <td>CAP_BPF</td>
+  <td>商用 EDR の主流実装。bcc / libbpf-CO-RE への依存が必要</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="cn-proc">cn_proc とは</h2>
+
+<p>
+<strong>cn_proc</strong> (process events connector) は、Linux カーネルが
+<a href="https://docs.kernel.org/driver-api/connector.html" target="_blank" rel="noopener">connector</a>
+インタフェースを介して送出するマルチキャストイベントです。netlink ソケットの
+<code>NETLINK_CONNECTOR</code> プロトコルファミリーで購読します。
+</p>
+
+<p>
+カーネルは以下のイベントを通知します:
+</p>
+
+<ul>
+  <li><code>PROC_EVENT_FORK</code>: fork(2) 完了時</li>
+  <li><code>PROC_EVENT_EXEC</code>: execve(2) 成功時</li>
+  <li><code>PROC_EVENT_EXIT</code>: プロセス終了時</li>
+  <li><code>PROC_EVENT_UID</code>, <code>PROC_EVENT_GID</code>: 権限変更時</li>
+  <li>その他 (sid, ptrace 等)</li>
+</ul>
+
+<p>
+URSUS は <strong>EXEC のみを購読</strong>しています。検知に必要な情報
+（プロセス名・コマンドライン・実行ファイル・親プロセス）は exec の
+タイミングで揃うためです。fork だけでは bash のプロセスが何回も
+fork した中身が分かりません。
+</p>
+
+<h2 id="netlink-protocol">netlink メッセージの構造</h2>
+
+<p>
+netlink で受け取るバイト列は 3 段の入れ子になっています。Python 標準
+ライブラリの <code>struct</code> モジュールで unpack して読み取ります。
+</p>
+
+<div class="diagram">
+<pre>
+  bytes 0  ─┐
+            │  ┌──────────────────────────────┐
+   nlmsghdr │  │ len, type, flags, seq, pid   │  16 bytes
+            │  └──────────────────────────────┘
+  bytes 16 ─┤
+            │  ┌──────────────────────────────┐
+   cn_msg   │  │ idx, val, seq, ack, len, fl  │  20 bytes
+            │  └──────────────────────────────┘
+  bytes 36 ─┤
+            │  ┌──────────────────────────────┐
+   evt_hdr  │  │ what, cpu, timestamp_ns      │  16 bytes
+            │  └──────────────────────────────┘
+  bytes 52 ─┤
+            │  ┌──────────────────────────────┐
+  body (exec)│ │ pid, tgid                    │  8 bytes
+            │  └──────────────────────────────┘
+  bytes 60 ─┘
+</pre>
+<p class="diagram-caption">PROC_EVENT_EXEC を含む netlink メッセージのレイアウト</p>
+</div>
+
+<h3 id="why-tgid">pid と tgid</h3>
+
+<p>
+exec イベントの body には <code>pid</code> と <code>tgid</code> の 2 つが入っています。
+Linux ではスレッドも軽量プロセスとして扱われるため、スレッドからの
+exec も通知が来ます。我々が「プロセス」と呼んでいる単位は <strong>tgid</strong>
+（thread group id、ユーザー空間からは getpid() で見える PID）に対応します。
+スレッド単位では tgid が同じで pid だけ異なるイベントが上がるため、
+取りこぼしを避けつつ重複も避けるには tgid で集約します。
+</p>
+
+<h2 id="code">URSUS の実装</h2>
+
+<p>
+ファイル: <code>src/ursus/sensor/process_collector_netlink.py</code>
+</p>
+
+<h3 id="step1">手順 1: netlink ソケットを開いて bind</h3>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_open_socket</span>(self):
+    s = socket.socket(socket.AF_NETLINK, socket.SOCK_DGRAM, NETLINK_CONNECTOR)
+    <span class="tk-com"># bind: pid=0 でカーネル自動採番、groups=CN_IDX_PROC で connector の</span>
+    <span class="tk-com"># プロセスイベントマルチキャストを購読。</span>
+    s.<span class="tk-fn">bind</span>((<span class="tk-num">0</span>, CN_IDX_PROC))
+    <span class="tk-kw">return</span> s</code></pre>
+
+<p>
+通常の TCP/UDP ソケットと同じ <code>socket.socket</code> ですが、
+<code>AF_NETLINK</code> ファミリーを指定し、プロトコル番号に
+<code>NETLINK_CONNECTOR = 11</code> を渡します。bind の groups 引数は
+購読するマルチキャストグループのビットマスクです。
+</p>
+
+<h3 id="step2">手順 2: 「購読開始」を kernel に通知</h3>
+
+<p>
+netlink ソケットを開いて bind しただけでは、まだイベントは流れて
+来ません。明示的に <code>PROC_CN_MCAST_LISTEN</code> を kernel に送ることで
+配信が始まります。
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_send_op</span>(self, op):
+    body = struct.<span class="tk-fn">pack</span>(<span class="tk-str">"=I"</span>, op)
+    cn_payload = _CNMSG.<span class="tk-fn">pack</span>(
+        CN_IDX_PROC, CN_VAL_PROC,    <span class="tk-com"># cb_id</span>
+        <span class="tk-num">0</span>, <span class="tk-num">0</span>,                        <span class="tk-com"># seq, ack</span>
+        <span class="tk-fn">len</span>(body), <span class="tk-num">0</span>,                <span class="tk-com"># len, flags</span>
+    ) + body
+    total_len = _NLMSGHDR.size + <span class="tk-fn">len</span>(cn_payload)
+    nl_hdr = _NLMSGHDR.<span class="tk-fn">pack</span>(total_len, NLMSG_DONE, <span class="tk-num">0</span>, <span class="tk-num">0</span>, <span class="tk-num">0</span>)
+    self._sock.<span class="tk-fn">send</span>(nl_hdr + cn_payload)</code></pre>
+
+<h3 id="step3">手順 3: 受信ループ</h3>
+
+<pre><code>self._sock.<span class="tk-fn">settimeout</span>(<span class="tk-num">0.2</span>)  <span class="tk-com"># stop_event を 200ms ごとに見るため</span>
+<span class="tk-kw">while</span> <span class="tk-kw">not</span> stop_event.<span class="tk-fn">is_set</span>():
+    <span class="tk-kw">try</span>:
+        data, _ = self._sock.<span class="tk-fn">recvfrom</span>(<span class="tk-num">8192</span>)
+    <span class="tk-kw">except</span> socket.timeout:
+        <span class="tk-kw">continue</span>
+    self.<span class="tk-fn">_handle_message</span>(data)</code></pre>
+
+<h3 id="step4">手順 4: バイト列を unpack</h3>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_handle_message</span>(self, data):
+    <span class="tk-com"># nlmsghdr はスキップ。cn_msg ヘッダから idx/val を確認。</span>
+    idx, val, _seq, _ack, _payload_len, _flags = _CNMSG.<span class="tk-fn">unpack_from</span>(
+        data, _NLMSGHDR.size
+    )
+    <span class="tk-kw">if</span> idx != CN_IDX_PROC <span class="tk-kw">or</span> val != CN_VAL_PROC:
+        <span class="tk-kw">return</span>
+
+    evt_off = _NLMSGHDR.size + _CNMSG.size
+    what, _cpu, _ts_ns = _EVTHDR.<span class="tk-fn">unpack_from</span>(data, evt_off)
+    body_off = evt_off + _EVTHDR.size
+
+    <span class="tk-kw">if</span> what == PROC_EVENT_EXEC:
+        pid, tgid = struct.<span class="tk-fn">unpack_from</span>(<span class="tk-str">"=II"</span>, data, body_off)
+        self.<span class="tk-fn">_record_exec</span>(tgid)</code></pre>
+
+<h3 id="step5">手順 5: /proc から詳細情報を取得</h3>
+
+<p>
+netlink から来るのは pid だけです。コマンドラインや実行ファイルパスは
+<code>/proc/&lt;pid&gt;/</code> 配下を読んで取得します。
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_read_proc_info</span>(pid):
+    base = Path(<span class="tk-str">f"/proc/{pid}"</span>)
+    comm    = (base / <span class="tk-str">"comm"</span>).<span class="tk-fn">read_text</span>().<span class="tk-fn">strip</span>()       <span class="tk-com"># プロセス名</span>
+    cmdline = (base / <span class="tk-str">"cmdline"</span>).<span class="tk-fn">read_bytes</span>()                 <span class="tk-com"># NULL 区切り argv</span>
+    status  = (base / <span class="tk-str">"status"</span>).<span class="tk-fn">read_text</span>()                  <span class="tk-com"># PPid, Uid 等</span>
+    exe     = os.<span class="tk-fn">readlink</span>(base / <span class="tk-str">"exe"</span>)                       <span class="tk-com"># 実行ファイルパス</span>
+
+    ppid, uid = <span class="tk-fn">_parse_status</span>(status)
+    parent_name = <span class="tk-fn">_read_comm</span>(ppid) <span class="tk-kw">if</span> ppid <span class="tk-kw">else</span> <span class="tk-kw">None</span>
+    username = pwd.<span class="tk-fn">getpwuid</span>(uid).pw_name <span class="tk-kw">if</span> uid <span class="tk-kw">is not</span> <span class="tk-kw">None</span> <span class="tk-kw">else</span> <span class="tk-kw">None</span>
+    ...</code></pre>
+
+<div class="warn">
+<strong>競合に注意</strong>
+<p>
+exec イベントが届いてから <code>/proc/&lt;pid&gt;/</code> を読むまでの間に、
+極短命なプロセスは消えていることがあります。コードは <code>FileNotFoundError</code>
+を捕捉して None を返すようにしていますが、その場合 cmdline が取れないため
+イベントは破棄します（cmdline なしでは検知に意味が無いため）。
+</p>
+</div>
+
+<h2 id="output">出力されるイベント</h2>
+
+<h3>raw_json</h3>
+<pre><code>{
+  <span class="tk-str">"pid"</span>: <span class="tk-num">4567</span>,
+  <span class="tk-str">"ppid"</span>: <span class="tk-num">1000</span>,
+  <span class="tk-str">"uid"</span>: <span class="tk-num">33</span>,
+  <span class="tk-str">"name"</span>: <span class="tk-str">"bash"</span>,
+  <span class="tk-str">"exe"</span>: <span class="tk-str">"/usr/bin/bash"</span>,
+  <span class="tk-str">"cmdline"</span>: [<span class="tk-str">"bash"</span>, <span class="tk-str">"-c"</span>, <span class="tk-str">"curl ... | sh"</span>],
+  <span class="tk-str">"username"</span>: <span class="tk-str">"www-data"</span>,
+  <span class="tk-str">"parent_name"</span>: <span class="tk-str">"nginx"</span>,
+  <span class="tk-str">"source"</span>: <span class="tk-str">"netlink"</span>
+}</code></pre>
+
+<h3>非正規化カラム</h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>カラム</th><th>値の例</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td><code>pid</code></td><td><code>4567</code></td><td>同 PID で前後コンテキストを引く</td></tr>
+<tr><td><code>ppid</code></td><td><code>1000</code></td><td>プロセスツリー再構築</td></tr>
+<tr><td><code>user</code></td><td><code>www-data</code></td><td>権限昇格検知</td></tr>
+<tr><td><code>process_name</code></td><td><code>bash</code></td><td>R001 (web→shell) 等で照合</td></tr>
+<tr><td><code>parent_process_name</code></td><td><code>nginx</code></td><td>親プロセス基準のルール</td></tr>
+<tr><td><code>cmdline</code></td><td><code>bash -c curl ... | sh</code></td><td>regex 検知</td></tr>
+<tr><td><code>exe_path</code></td><td><code>/usr/bin/bash</code></td><td>/tmp 配下からの実行検知 (R010)</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="limits">制限と既知の挙動</h2>
+
+<ul>
+  <li><strong>fork のみのイベントは取れない</strong>:
+    EXEC を購読しているため、fork(2) の後 exec(2) しないプロセス
+    （長期常駐の bash と同名 binary など）は記録されません。
+    通常は親プロセスから fork → exec の流れなので問題になりません。</li>
+  <li><strong>extreme short-lived プロセス</strong>:
+    netlink から通知が届いた直後に <code>/proc/&lt;pid&gt;/</code> が消えるほど
+    短命なプロセスは捨てます（数 ms オーダーの終了）。</li>
+  <li><strong>コンテナ識別なし</strong>:
+    cgroup 情報を見ていないため、Docker / containerd 内のプロセスも
+    ホスト側の pid で混在する。コンテナ識別は未実装。</li>
+  <li><strong>権限</strong>:
+    <code>CAP_NET_ADMIN</code> が必要。systemd ユニットでは
+    <code>AmbientCapabilities=CAP_NET_ADMIN</code> + <code>User=ursus</code> で
+    最小権限化が可能です（現状は実装未着手）。</li>
+</ul>
+
+<h2 id="vs-ebpf">eBPF + LSM hook との比較</h2>
+
+<p>
+商用 EDR の主流は <strong>eBPF + LSM hook</strong>。
+<code>security_bprm_check</code> や <code>execve</code> tracepoint に bpf プログラムを
+attach することで、cn_proc では取れない以下が可能になる。
+</p>
+<ul>
+  <li>cgroup / namespace / capability set など task_struct の任意フィールド取得</li>
+  <li>カーネルから user space への効率的な ring buffer 転送</li>
+  <li>LSM hook を使えば exec の <strong>拒否</strong>もできる (block_process 系アクションの実装基盤)</li>
+</ul>
+
+<p>
+URSUS は cn_proc + Python <code>struct</code> による実装を採用しており、bcc / libbpf
+等の追加依存を持たない。トレードオフは上記 3 点の機能を諦めること。
+詳しくは <a href="../glossary.html#ebpf">glossary: eBPF</a>。
+</p>
+
+<h2 id="next">関連ドキュメント</h2>
+<ul>
+  <li><a href="../detector/pipeline.html">Detector Pipeline</a> — process イベントが評価される流れ</li>
+  <li><a href="file.html">File Collector</a> — inotify による次のセンサ</li>
+</ul>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+</article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

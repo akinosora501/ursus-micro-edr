@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Detector の仕組み · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <aside id="sidebar"
+      class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="../index.html"
+        class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="../assets/ursus_logo.png" alt="URSUS" class="h-8 w-auto">
+        <span
+          class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../index.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">URSUSとは</a></li>
+            <li><a href="../quickstart.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">インストールと実行</a>
+            </li>
+            <li><a href="../architecture.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">アーキテクチャ</a>
+            </li>
+            <li><a href="../disclaimer.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">免責事項</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../sensors/mechanisms.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Sensor の仕組み</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="pipeline.html"
+                class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">Detector の仕組み</a>
+            </li>
+            <li><a href="rules.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Koguma ルールの定義</a></li>
+            <li><a href="responses.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">レスポンス動作</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../operations.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">設定の変更</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">
+        URSUS · MIT License
+      </div>
+    </aside>
+
+    <!-- ── Content area ─────────────────────────────────────────── -->
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <!-- Mobile header -->
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()"
+          class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label="メニューを開く">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <a href="../index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="../assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1>Detector の仕組み</h1>
+<p class="subtitle">events 表をストリーム的に追跡し、ルールを評価してアラートを発火するエンジン</p>
+
+<h2 id="overview">パイプライン全体</h2>
+
+<div class="diagram">
+<pre>
+                              ┌─────────────────────────────┐
+                              │       events 表             │
+                              │   (Sensor が常に追記)        │
+                              └─────────────┬───────────────┘
+                                            │
+                                            │ SELECT * FROM events
+                                            │ WHERE id &gt; checkpoint
+                                            │ ORDER BY id ASC LIMIT 500
+                                            ▼
+                              ┌─────────────────────────────┐
+                              │   _tick (1 sec interval)     │
+                              └─────────────┬───────────────┘
+                                            │
+                                            ▼
+                              ┌─────────────────────────────┐
+                              │   _evaluate_event(ev)        │
+                              │   ↓ event_type で分類         │
+                              │   ↓ 該当ルールをループ         │
+                              │   ↓ eval_condition(rule, ev) │
+                              └─────────────┬───────────────┘
+                                            │ match
+                                            ▼
+                              ┌─────────────────────────────┐
+                              │   _fire_alert                │
+                              │   ↓ 二重発火チェック           │
+                              │   ↓ INSERT alerts             │
+                              │   ↓ ResponseHandler.dispatch  │
+                              └─────────────┬───────────────┘
+                                            │
+                                            ▼
+                                    response_log
+</pre>
+</div>
+
+<h2 id="checkpoint">チェックポイント駆動</h2>
+
+<p>
+Detector が "どこまで評価したか" は <code>detector_state</code> 表に
+<code>last_evaluated_event_id</code> として永続化されています。
+</p>
+
+<pre><code>CHECKPOINT_KEY = <span class="tk-str">"last_evaluated_event_id"</span>
+
+<span class="tk-kw">def</span> <span class="tk-fn">_load_checkpoint</span>(self, conn):
+    row = conn.<span class="tk-fn">execute</span>(
+        <span class="tk-str">"SELECT value FROM detector_state WHERE key = ?"</span>, (CHECKPOINT_KEY,)
+    ).<span class="tk-fn">fetchone</span>()
+    <span class="tk-kw">return</span> <span class="tk-fn">int</span>(row[<span class="tk-str">"value"</span>]) <span class="tk-kw">if</span> row <span class="tk-kw">else</span> <span class="tk-num">0</span>
+
+<span class="tk-kw">def</span> <span class="tk-fn">_save_checkpoint</span>(self, conn, last_id):
+    conn.<span class="tk-fn">execute</span>(
+        <span class="tk-str">"INSERT INTO detector_state(key, value) VALUES(?, ?) "</span>
+        <span class="tk-str">"ON CONFLICT(key) DO UPDATE SET value = excluded.value"</span>,
+        (CHECKPOINT_KEY, <span class="tk-fn">str</span>(last_id)),
+    )</code></pre>
+
+<p>
+これにより以下が成立します:
+</p>
+
+<ul>
+  <li><strong>Detector の再起動に強い</strong>: 終了→再起動しても同じ event を再評価しない</li>
+  <li><strong>Sensor との完全な疎結合</strong>: Sensor が追記する間に Detector が落ちても events は失われない</li>
+  <li><strong>追いかけ評価</strong>: バックログがある状態で起動した場合も、checkpoint を起点に追いつける</li>
+</ul>
+
+<h2 id="tick">1 ティックの処理</h2>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_tick</span>(self, conn, last_id):
+    rows = conn.<span class="tk-fn">execute</span>(
+        <span class="tk-str">"SELECT * FROM events WHERE id &gt; ? ORDER BY id ASC LIMIT ?"</span>,
+        (last_id, FETCH_LIMIT),
+    ).<span class="tk-fn">fetchall</span>()
+    <span class="tk-kw">for</span> ev <span class="tk-kw">in</span> rows:
+        self.<span class="tk-fn">_evaluate_event</span>(conn, ev)
+        last_id = ev[<span class="tk-str">"id"</span>]
+    <span class="tk-kw">if</span> rows:
+        self.<span class="tk-fn">_save_checkpoint</span>(conn, last_id)
+    <span class="tk-kw">return</span> last_id</code></pre>
+
+<p>
+1 回のフェッチは最大 500 件 (<code>FETCH_LIMIT</code>) に制限されます。これにより:
+</p>
+
+<ul>
+  <li>大量のバックログがあっても 1 ティックでメモリを使い切らない</li>
+  <li>1 件ずつ評価して checkpoint を更新するので、評価中にクラッシュしても次回起動時に重複評価が最小限で済む</li>
+</ul>
+
+<h2 id="rule-classify">ルールの event_type 別分類</h2>
+
+<p>
+URSUS は起動時にルールを <code>event_type</code> ごとに分類しておきます。
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">__init__</span>(self, db_path, rules, response_handler, poll_interval=<span class="tk-num">1.0</span>):
+    ...
+    self.rules_by_type = {}
+    <span class="tk-kw">for</span> r <span class="tk-kw">in</span> rules:
+        self.rules_by_type.<span class="tk-fn">setdefault</span>(r.event_type, []).<span class="tk-fn">append</span>(r)
+
+<span class="tk-kw">def</span> <span class="tk-fn">_evaluate_event</span>(self, conn, ev):
+    <span class="tk-kw">for</span> rule <span class="tk-kw">in</span> self.rules_by_type.<span class="tk-fn">get</span>(ev[<span class="tk-str">"event_type"</span>], []):
+        <span class="tk-kw">if</span> <span class="tk-kw">not</span> rule.enabled:
+            <span class="tk-kw">continue</span>
+        <span class="tk-kw">if</span> <span class="tk-fn">eval_condition</span>(rule.condition, ev):
+            self.<span class="tk-fn">_fire_alert</span>(conn, rule, ev)</code></pre>
+
+<p>
+これは単純な最適化です: process イベントに対して file ルールや network
+ルールを評価しても無駄なので、event_type が一致するルールだけを試します。
+</p>
+
+<h2 id="condition-eval">condition の評価</h2>
+
+<p>
+ルールの <code>condition</code> は再帰的なツリーです。詳細は
+<a href="rules.html">Rules DSL</a> を参照。
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">eval_condition</span>(node, event):
+    <span class="tk-kw">if</span> <span class="tk-str">"all"</span> <span class="tk-kw">in</span> node:
+        <span class="tk-kw">return</span> <span class="tk-fn">all</span>(<span class="tk-fn">eval_condition</span>(c, event) <span class="tk-kw">for</span> c <span class="tk-kw">in</span> node[<span class="tk-str">"all"</span>])
+    <span class="tk-kw">if</span> <span class="tk-str">"any"</span> <span class="tk-kw">in</span> node:
+        <span class="tk-kw">return</span> <span class="tk-fn">any</span>(<span class="tk-fn">eval_condition</span>(c, event) <span class="tk-kw">for</span> c <span class="tk-kw">in</span> node[<span class="tk-str">"any"</span>])
+    <span class="tk-kw">if</span> <span class="tk-str">"not"</span> <span class="tk-kw">in</span> node:
+        <span class="tk-kw">return</span> <span class="tk-kw">not</span> <span class="tk-fn">eval_condition</span>(node[<span class="tk-str">"not"</span>], event)
+    <span class="tk-com"># リーフ</span>
+    value = <span class="tk-fn">extract_field</span>(event, node[<span class="tk-str">"field"</span>])
+    <span class="tk-kw">return</span> OPERATORS[node[<span class="tk-str">"op"</span>]](value, node.<span class="tk-fn">get</span>(<span class="tk-str">"value"</span>))</code></pre>
+
+<h3 id="extract-field">フィールド抽出</h3>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">extract_field</span>(event, field):
+    <span class="tk-kw">if</span> field.<span class="tk-fn">startswith</span>(<span class="tk-str">"raw."</span>):
+        <span class="tk-com"># raw_json の中身を dot 記法で取り出す</span>
+        data = json.<span class="tk-fn">loads</span>(event[<span class="tk-str">"raw_json"</span>])
+        <span class="tk-kw">for</span> key <span class="tk-kw">in</span> field.<span class="tk-fn">split</span>(<span class="tk-str">"."</span>)[<span class="tk-num">1</span>:]:
+            <span class="tk-kw">if</span> <span class="tk-kw">not</span> <span class="tk-fn">isinstance</span>(data, <span class="tk-fn">dict</span>): <span class="tk-kw">return</span> <span class="tk-kw">None</span>
+            data = data.<span class="tk-fn">get</span>(key)
+            <span class="tk-kw">if</span> data <span class="tk-kw">is</span> <span class="tk-kw">None</span>: <span class="tk-kw">return</span> <span class="tk-kw">None</span>
+        <span class="tk-kw">return</span> data
+    <span class="tk-com"># 非正規化カラム名</span>
+    <span class="tk-kw">return</span> event[field]</code></pre>
+
+<p>
+ルール側からは:
+</p>
+
+<ul>
+  <li><code>field: process_name</code> → 非正規化カラム <code>events.process_name</code></li>
+  <li><code>field: raw.cmdline</code> → <code>raw_json["cmdline"]</code></li>
+  <li><code>field: raw.parent.cmdline</code> → <code>raw_json["parent"]["cmdline"]</code> (dot 記法)</li>
+</ul>
+
+<h2 id="operators">比較演算子</h2>
+
+<p>
+URSUS の演算子は単純な純関数です。<code>(event_value, rule_value) -&gt; bool</code>。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>op</th><th>意味</th><th>例</th></tr></thead>
+<tbody>
+<tr><td><code>eq</code></td><td>等価</td><td><code>op: eq, value: bash</code></td></tr>
+<tr><td><code>neq</code></td><td>非等価</td><td><code>op: neq, value: root</code></td></tr>
+<tr><td><code>in</code></td><td>リスト含有</td><td><code>op: in, value: [bash, sh, dash]</code></td></tr>
+<tr><td><code>not_in</code></td><td>リスト非含有</td><td><code>op: not_in, value: [systemd, init]</code></td></tr>
+<tr><td><code>regex</code></td><td>正規表現マッチ (re.search)</td><td><code>op: regex, value: "(curl|wget).+\\|"</code></td></tr>
+<tr><td><code>contains</code></td><td>部分文字列</td><td><code>op: contains, value: "/.ssh/"</code></td></tr>
+<tr><td><code>startswith</code></td><td>前方一致</td><td><code>op: startswith, value: /tmp/</code></td></tr>
+<tr><td><code>endswith</code></td><td>後方一致</td><td><code>op: endswith, value: .sh</code></td></tr>
+<tr><td><code>gt</code> / <code>lt</code></td><td>数値比較</td><td><code>op: gt, value: 1024</code></td></tr>
+<tr><td><code>exists</code></td><td>None でない</td><td><code>op: exists</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>
+コード: <code>src/ursus/detector/operators.py</code>
+</p>
+
+<pre><code>OPERATORS = {
+    <span class="tk-str">"eq"</span>:         <span class="tk-kw">lambda</span> a, b: a == b,
+    <span class="tk-str">"neq"</span>:        <span class="tk-kw">lambda</span> a, b: a != b,
+    <span class="tk-str">"in"</span>:         <span class="tk-kw">lambda</span> a, b: a <span class="tk-kw">in</span> b <span class="tk-kw">if</span> <span class="tk-fn">isinstance</span>(b, <span class="tk-fn">list</span>) <span class="tk-kw">else</span> <span class="tk-kw">False</span>,
+    <span class="tk-str">"not_in"</span>:     <span class="tk-kw">lambda</span> a, b: a <span class="tk-kw">not</span> <span class="tk-kw">in</span> b <span class="tk-kw">if</span> <span class="tk-fn">isinstance</span>(b, <span class="tk-fn">list</span>) <span class="tk-kw">else</span> <span class="tk-kw">False</span>,
+    <span class="tk-str">"regex"</span>:      <span class="tk-kw">lambda</span> a, b: <span class="tk-kw">bool</span>(re.<span class="tk-fn">search</span>(b, <span class="tk-fn">str</span>(a))) <span class="tk-kw">if</span> a <span class="tk-kw">is not</span> <span class="tk-kw">None</span> <span class="tk-kw">else</span> <span class="tk-kw">False</span>,
+    <span class="tk-str">"contains"</span>:   <span class="tk-kw">lambda</span> a, b: b <span class="tk-kw">in</span> <span class="tk-fn">str</span>(a) <span class="tk-kw">if</span> a <span class="tk-kw">is not</span> <span class="tk-kw">None</span> <span class="tk-kw">else</span> <span class="tk-kw">False</span>,
+    <span class="tk-str">"exists"</span>:     <span class="tk-kw">lambda</span> a, b: a <span class="tk-kw">is not</span> <span class="tk-kw">None</span>,
+    ...
+}</code></pre>
+
+<h2 id="alert-fire">アラート発火</h2>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_fire_alert</span>(self, conn, rule, ev):
+    <span class="tk-com"># 同じ (rule, event) で二重発火しないように事前 SELECT</span>
+    existing = conn.<span class="tk-fn">execute</span>(
+        <span class="tk-str">"SELECT id FROM alerts WHERE rule_id = ? AND triggered_event_id = ?"</span>,
+        (rule.id, ev[<span class="tk-str">"id"</span>]),
+    ).<span class="tk-fn">fetchone</span>()
+    <span class="tk-kw">if</span> existing:
+        <span class="tk-kw">return</span>
+
+    cur = conn.<span class="tk-fn">execute</span>(
+        <span class="tk-str">"INSERT INTO alerts "</span>
+        <span class="tk-str">"(timestamp, rule_id, rule_title, severity, triggered_event_id, mitre) "</span>
+        <span class="tk-str">"VALUES (?, ?, ?, ?, ?, ?)"</span>,
+        (time.<span class="tk-fn">time</span>(), rule.id, rule.title, rule.severity,
+         ev[<span class="tk-str">"id"</span>], json.<span class="tk-fn">dumps</span>(rule.mitre)),
+    )
+    alert_id = cur.lastrowid
+
+    self.response_handler.<span class="tk-fn">dispatch</span>(conn, rule, alert_id, ev)</code></pre>
+
+<h3 id="dedup">重複発火の防止</h3>
+
+<p>
+バックフィル機能（過去 events への遡及評価）や、Detector のクラッシュ後再起動で
+checkpoint より少し前から評価しなおすケースに備えて、同じ (rule, event) ペアでの
+INSERT を事前 SELECT で抑止しています。
+</p>
+
+<p>
+本来は <code>UNIQUE(rule_id, triggered_event_id)</code> 制約を張る方がきれいですが、
+読み下しやすさを優先して事前 SELECT 方式で実装している。
+</p>
+
+<h2 id="loop">メインループ</h2>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">run</span>(self, stop_event):
+    conn = <span class="tk-fn">get_connection</span>(self.db_path)
+    <span class="tk-kw">try</span>:
+        last_id = self.<span class="tk-fn">_load_checkpoint</span>(conn)
+        <span class="tk-kw">while</span> <span class="tk-kw">not</span> stop_event.<span class="tk-fn">is_set</span>():
+            <span class="tk-kw">try</span>:
+                last_id = self.<span class="tk-fn">_tick</span>(conn, last_id)
+            <span class="tk-kw">except</span> Exception:
+                self.log.<span class="tk-fn">exception</span>(<span class="tk-str">"engine_tick_failed"</span>)
+            stop_event.<span class="tk-fn">wait</span>(self.poll_interval)
+    <span class="tk-kw">finally</span>:
+        conn.<span class="tk-fn">close</span>()</code></pre>
+
+<p>
+シンプルです。ポーリング間隔は <code>poll_interval_sec</code>（既定 1 秒）。
+SIGTERM が来ると <code>stop_event</code> が set され、現在のティックが終わったら
+ループを抜けて DB をクローズします。
+</p>
+
+<h2 id="performance">パフォーマンス特性</h2>
+
+<ul>
+  <li><strong>1 イベントあたりの評価コスト</strong>: O(rules × condition_complexity)。
+    現状 9 ルール × 浅い AND/OR ツリーなので、1 イベント数十マイクロ秒。</li>
+  <li><strong>バックログがあるとき</strong>: 1 ティックで最大 500 件評価 → 1 秒で 500 件。
+    10 万件のバックログでも 200 秒で追いつく。</li>
+  <li><strong>idle 時の CPU 消費</strong>: ほぼゼロ。SELECT が空を返すだけ。</li>
+  <li><strong>DB ロック競合</strong>: WAL モードなので Sensor の INSERT と Detector の SELECT は
+    並行可能。Detector の INSERT (alerts) も短時間で済む。</li>
+</ul>
+
+<h2 id="future">未実装の拡張</h2>
+
+<h3>バックフィル CLI</h3>
+
+<p>
+DESIGN.md §6.4.5 では <code>ursus-detector --backfill --since "2026-04-01"</code> で
+過去の events を再評価する機能が想定されています。現状未実装ですが、
+checkpoint を一旦 0 に戻して特定範囲を SELECT するだけで実装可能です。
+</p>
+
+<h3>時間窓型ルール</h3>
+
+<p>
+R006 (SSH 短時間多発失敗) のような閾値型は現在の DSL では表現できません。
+condition に <code>time_window</code> フィールドを追加し、過去 N 秒の events を
+集計してから match させる仕組みが必要です。
+</p>
+
+<h3>ルールマッチの並列化</h3>
+
+<p>
+現在は 1 イベントを 1 スレッドで全ルール評価しています。ルール数が増えたら
+並列化の余地がありますが、9 ルール程度では効果ゼロです。
+</p>
+
+<h2 id="next">関連ドキュメント</h2>
+<ul>
+  <li><a href="rules.html">検知ルールの定義</a> — condition の文法詳細</li>
+  <li><a href="responses.html">レスポンス動作</a> — alert / kill / quarantine / block</li>
+</ul>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+</article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

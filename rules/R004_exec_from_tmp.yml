@@ -1,0 +1,18 @@
+id: R004
+title: /tmp 配下からのバイナリ実行
+description: 攻撃者が一時領域にペイロードを置いて実行するパターン。
+severity: medium
+event_type: process
+condition:
+  any:
+    - field: exe_path
+      op: startswith
+      value: /tmp/
+    - field: exe_path
+      op: startswith
+      value: /var/tmp/
+    - field: exe_path
+      op: startswith
+      value: /dev/shm/
+response:
+  - alert

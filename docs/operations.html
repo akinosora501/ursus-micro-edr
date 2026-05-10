@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>設定の変更 · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <aside id="sidebar"
+      class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="index.html"
+        class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="assets/ursus_logo.png" alt="URSUS" class="h-8 w-auto">
+        <span
+          class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="index.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">URSUSとは</a></li>
+            <li><a href="quickstart.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">インストールと実行</a>
+            </li>
+            <li><a href="architecture.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">アーキテクチャ</a>
+            </li>
+            <li><a href="disclaimer.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">免責事項</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="sensors/mechanisms.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Sensor の仕組み</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="detector/pipeline.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Detector の仕組み</a>
+            </li>
+            <li><a href="detector/rules.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Koguma ルールの定義</a></li>
+            <li><a href="detector/responses.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">レスポンス動作</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="operations.html"
+                class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">設定の変更</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">
+        URSUS · MIT License
+      </div>
+    </aside>
+
+    <!-- ── Content area ─────────────────────────────────────────── -->
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <!-- Mobile header -->
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()"
+          class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label="メニューを開く">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <a href="index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1>設定の変更</h1>
+<p class="subtitle">config.yml の全項目リファレンスと Settings ページの使い方</p>
+
+<h2 id="two-ways">設定変更</h2>
+
+<p>
+URSUS の動作設定は <strong>config.yml</strong> 1 ファイルに集約されています。
+これを編集する方法が 2 つあります。
+</p>
+
+<div class="cards">
+  <div class="card">
+    <h3>① config.yml を直接編集</h3>
+    <p>テキストエディタで開いて書き換える、最もシンプルな方法。コメントを保持できる。CLI 派におすすめ。</p>
+  </div>
+  <div class="card">
+    <h3>② Settings ページから編集</h3>
+    <p>Web UI のフォームから値を入れて Save。Pydantic で型検証されてから書き戻されるので、構文ミスを起こしにくい。</p>
+  </div>
+</div>
+
+<div class="warn">
+  <strong>注意：どちらで編集しても、保存後にプロセスを再起動するまで反映されません</strong>
+</div>
+
+<h2 id="settings-ui">Settings ページの使い方</h2>
+
+<p>
+ブラウザから <code>http://127.0.0.1:8080/settings</code> にアクセスすると、
+config.yml の全項目がフォームとして表示されます。
+</p>
+
+<h3 id="settings-layout">画面構成</h3>
+
+<ul>
+  <li><strong>amber バナー</strong>: 「保存後はプロセス再起動が必要」リマインダ</li>
+  <li><strong>セクション別カード</strong>: database / sensor / detector / ui / logging が個別カードに分かれる</li>
+  <li><strong>Save ボタン</strong>: 入力値を JSON で <code>POST /settings</code> に送信。Pydantic 検証 → 通れば config.yml をアトミック書き込み</li>
+  <li><strong>Reload from disk</strong>: フォームの編集中身を破棄して、ディスクから読み直す（= ページリロード）</li>
+  <li><strong>「現在のディスク上の config.yml」</strong>: ページ末尾の details で生 YAML を読み取り専用表示</li>
+</ul>
+
+<h3 id="settings-validation">バリデーション</h3>
+
+<p>
+Save 時に型違反や制約違反があれば、ページ上部に赤いバナーでエラー一覧が出ます。
+</p>
+
+<pre><code>入力エラーがあります:
+  &bull; <span class="tk-fn">ui.bind_host</span> — Value error, ui.bind_host must be loopback; got '0.0.0.0'
+  &bull; <span class="tk-fn">database.retention_days</span> — Input should be a valid integer</code></pre>
+
+<p>
+エラーが残っている間は config.yml は書き換わりません。
+</p>
+
+<h2 id="reference">設定項目リファレンス</h2>
+
+<h3 id="database"><code>database</code></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>型</th><th>既定</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>path</code></td>
+  <td>string</td>
+  <td><code>./data/edr.db</code></td>
+  <td>SQLite ファイルの場所。WAL/SHM ファイルも同じディレクトリに作られる</td>
+</tr>
+<tr>
+  <td><code>retention_days</code></td>
+  <td>int</td>
+  <td><code>14</code></td>
+  <td>events 表の保持日数。Detector の起動時と 24h ごとに古い行を削除。alerts と response_log は対象外</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="info">
+<strong>db ディレクトリは sensor の file_collector が自動除外する</strong>
+<p>
+SQLite の WAL / SHM が秒間数千の modify を生むため、URSUS は db 配下の
+ファイル変更を <strong>無条件で除外</strong>します（実装は <code>_is_excluded()</code>）。
+config 側で何もしなくても自己フィードバックループは起きません。
+</p>
+</div>
+
+<h3 id="sensor-hostname"><code>sensor.hostname</code></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>型</th><th>既定</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>hostname</code></td>
+  <td>string</td>
+  <td><code>auto</code></td>
+  <td><code>auto</code> なら <code>socket.gethostname()</code>。任意の文字列を指定すると events 表の hostname カラムに記録される</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="sensor-process"><code>sensor.process</code></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>型</th><th>既定</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>enabled</code></td>
+  <td>bool</td>
+  <td><code>true</code></td>
+  <td>無効化するとプロセス起動イベントが一切記録されなくなる</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>
+プロセスコレクタは netlink (cn_proc) で kernel から push 通知を受けます。
+ポーリング間隔等の設定はありません。詳細は
+<a href="sensors/mechanisms.html#process">Process Collector</a>。
+</p>
+
+<h3 id="sensor-file"><code>sensor.file</code></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>型</th><th>既定</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>enabled</code></td>
+  <td>bool</td>
+  <td><code>true</code></td>
+  <td>ファイル変更監視を on/off</td>
+</tr>
+<tr>
+  <td><code>watch_paths</code></td>
+  <td>list&lt;string&gt;</td>
+  <td><code>[/etc, /tmp, /var/tmp, /home]</code></td>
+  <td>再帰監視するディレクトリ。<strong>1 行 1 パス</strong>で記述。/home 全体は重い場合があるので絞ることを推奨</td>
+</tr>
+<tr>
+  <td><code>exclude_patterns</code></td>
+  <td>list&lt;string&gt;</td>
+  <td><code>[*.swp, *~]</code></td>
+  <td>glob 除外パターン。basename と絶対パスの両方とマッチ判定</td>
+</tr>
+<tr>
+  <td><code>modify_debounce_sec</code></td>
+  <td>float</td>
+  <td><code>2.0</code></td>
+  <td>同一 path への連続 modify を 1 ウィンドウに圧縮する秒数。<code>0</code> で無効化</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="sensor-network"><code>sensor.network</code></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>型</th><th>既定</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>enabled</code></td>
+  <td>bool</td>
+  <td><code>true</code></td>
+  <td>TCP 接続テーブル監視を on/off</td>
+</tr>
+<tr>
+  <td><code>poll_interval_sec</code></td>
+  <td>float</td>
+  <td><code>2.0</code></td>
+  <td>差分ポーリングの周期。短いほど取りこぼしが減るが CPU を消費</td>
+</tr>
+<tr>
+  <td><code>established_debounce_sec</code></td>
+  <td>float</td>
+  <td><code>5.0</code></td>
+  <td>同一 (pid, remote_ip, remote_port) への ESTABLISHED 連発を抑制する秒数。<code>0</code> で無効化。LISTEN は対象外で常に記録される</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="sensor-auth"><code>sensor.auth</code></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>型</th><th>既定</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>enabled</code></td>
+  <td>bool</td>
+  <td><code>true</code></td>
+  <td>認証ログ購読を on/off</td>
+</tr>
+<tr>
+  <td><code>journal_units</code></td>
+  <td>list&lt;string&gt;</td>
+  <td><code>[ssh.service, sshd.service]</code></td>
+  <td>journalctl の <code>_SYSTEMD_UNIT</code> match。1 行 1 ユニット</td>
+</tr>
+<tr>
+  <td><code>journal_comms</code></td>
+  <td>list&lt;string&gt;</td>
+  <td><code>[sudo]</code></td>
+  <td>journalctl の <code>_COMM</code> match。1 行 1 プロセス名</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="note">
+<p>
+journalctl の match セマンティクス: 同じフィールド同士は OR、異なるフィールド同士は AND、<code>+</code> 区切りで OR グループ化。詳細は
+<a href="sensors/mechanisms.html#auth">Auth Collector</a>。
+</p>
+</div>
+
+<h3 id="detector"><code>detector</code></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>型</th><th>既定</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>enabled</code></td>
+  <td>bool</td>
+  <td><code>true</code></td>
+  <td>Detector 全体を on/off</td>
+</tr>
+<tr>
+  <td><code>poll_interval_sec</code></td>
+  <td>float</td>
+  <td><code>1.0</code></td>
+  <td>events 表をチェックする周期。短くすると検知遅延が減るが CPU を使う</td>
+</tr>
+<tr>
+  <td><code>rules_dir</code></td>
+  <td>string</td>
+  <td><code>./rules</code></td>
+  <td>YAML ルールを格納するディレクトリ。配下の <code>*.yml</code> を全てロード</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="response"><code>detector.response</code></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>型</th><th>既定</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>dry_run</code></td>
+  <td>bool</td>
+  <td><code>true</code></td>
+  <td><code>true</code> なら全アクションが実行されず response_log に <code>dry_run=1</code> として記録される。<strong>off にする前に充分テストすること</strong></td>
+</tr>
+<tr>
+  <td><code>allowed_actions</code></td>
+  <td>list&lt;string&gt;</td>
+  <td><code>[alert]</code></td>
+  <td>許可するアクション名。リストにないアクションはルールが指定しても <code>not in allowed_actions</code> として拒否される</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h4>使用可能なアクション一覧</h4>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>アクション</th><th>状態</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>alert</code></td>
+  <td>有効</td>
+  <td>response_log に通知を残す。実害ゼロ。常に許可することを推奨</td>
+</tr>
+<tr>
+  <td><code>kill_process</code></td>
+  <td>有効</td>
+  <td>SIGTERM でプロセス停止。PID&le;1 と detector 自身は安全装置で除外</td>
+</tr>
+<tr>
+  <td><code>quarantine_file</code></td>
+  <td>有効</td>
+  <td>chmod 000 + <code>/var/quarantine/ursus/</code> へ移動。<code>/etc/passwd</code> 等の重要パスは安全装置で除外</td>
+</tr>
+<tr>
+  <td><code>block_network</code></td>
+  <td>無効</td>
+  <td>本ビルドでは恒久的に無効。リストに書いても iptables は呼ばれず、response_log に refused として記録される</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="warn">
+<strong>dry_run を off にする前に</strong>
+<p>
+URSUS には <code>R901_test_kill_process</code> / <code>R902_test_quarantine_file</code> というテスト用ルールが同梱されています。先にこれで挙動確認することを推奨します。
+</p>
+</div>
+
+<h3 id="ui"><code>ui</code></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>型</th><th>既定</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>bind_host</code></td>
+  <td>string</td>
+  <td><code>127.0.0.1</code></td>
+  <td><strong>ループバック (127.0.0.1 / ::1 / localhost) のみ許可</strong>。それ以外を指定すると起動時に Pydantic が拒否する</td>
+</tr>
+<tr>
+  <td><code>bind_port</code></td>
+  <td>int</td>
+  <td><code>8080</code></td>
+  <td>UI のリスンポート</td>
+</tr>
+<tr>
+  <td><code>events_per_page</code></td>
+  <td>int</td>
+  <td><code>50</code></td>
+  <td><code>/events</code> ページの 1 ページあたり件数</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="danger">
+<strong>bind_host を 0.0.0.0 にしないでください</strong>
+<p>
+URSUS の UI には認証機構がありません。外部から到達可能な IP に bind すると、誰でもイベント / アラートを閲覧でき、Settings から config.yml を書き換えられる状態になります。Pydantic 側で起動時に弾く実装になっているのは、この事故防止のためです。
+</p>
+</div>
+
+<h3 id="logging"><code>logging</code></h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>型</th><th>既定</th><th>説明</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>level</code></td>
+  <td>enum</td>
+  <td><code>INFO</code></td>
+  <td><code>DEBUG</code> / <code>INFO</code> / <code>WARNING</code> / <code>ERROR</code></td>
+</tr>
+<tr>
+  <td><code>format</code></td>
+  <td>enum</td>
+  <td><code>json</code></td>
+  <td><code>json</code> = 1 行 1 JSON、<code>text</code> = 人間可読</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="systemd">systemd で常駐させる</h2>
+
+<p>
+URSUS は <code>scripts/install.sh</code> によって systemd ユニットとして登録できる。
+インストール後は 3 つの service unit (<code>ursus-sensor</code> /
+<code>ursus-detector</code> / <code>ursus-ui</code>) が
+<code>/etc/systemd/system/</code> に配置される。
+</p>
+
+<h3 id="systemd-install">インストール</h3>
+
+<pre><code>$ git clone https://github.com/&lt;user&gt;/ursus.git
+$ cd ursus
+$ <span class="tk-kw">sudo</span> ./scripts/install.sh</code></pre>
+
+<p>インストールスクリプトの動作:</p>
+
+<ol>
+  <li>システムユーザー <code>ursus</code> を作成 (UI の実行アカウント)</li>
+  <li>リポジトリ内容を <code>/opt/ursus/</code> に rsync (<code>.git</code> / <code>.venv</code> / <code>data</code> / <code>docs</code> は除外)</li>
+  <li><code>/opt/ursus/.venv/</code> に venv を作って <code>pip install -e</code></li>
+  <li>権限を設定 (sensor/detector は root、UI は ursus user で動作)</li>
+  <li>systemd ユニットを <code>/etc/systemd/system/</code> に配置し <code>daemon-reload</code></li>
+</ol>
+
+<div class="info">
+<strong>auto-start はしない</strong>
+<p>
+インストール時点では <code>systemctl start</code> も <code>enable</code> もしない。
+明示的に <code>start.sh</code> を実行するか <code>systemctl</code> を直接叩く必要がある。
+</p>
+</div>
+
+<h3 id="systemd-startstop">起動と停止</h3>
+
+<p>
+<code>start.sh</code> は 3 サービスを順に起動して状態を 1 行ずつ表示する。
+</p>
+
+<pre><code>$ <span class="tk-kw">sudo</span> /opt/ursus/scripts/start.sh
+
+&gt;&gt;&gt; starting URSUS
+status:
+  ursus-sensor         active
+  ursus-detector       active
+  ursus-ui             active
+
+  ui   :  http://127.0.0.1:8080/
+  logs :  journalctl -u ursus-sensor -u ursus-detector -u ursus-ui -f</code></pre>
+
+<pre><code>$ <span class="tk-kw">sudo</span> /opt/ursus/scripts/stop.sh</code></pre>
+
+<h3 id="systemd-boot">boot 時自動起動を有効化</h3>
+
+<p>
+<code>start.sh</code> は単に起動するだけで boot 時の自動起動は設定しない。
+有効化するには <code>systemctl enable</code> を直接実行する。
+</p>
+
+<pre><code>$ <span class="tk-kw">sudo</span> systemctl enable ursus-sensor ursus-detector ursus-ui</code></pre>
+
+<h3 id="systemd-status">状態とログの確認</h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>用途</th><th>コマンド</th></tr></thead>
+<tbody>
+<tr><td>サービスの稼働状態</td><td><code>systemctl status ursus-sensor</code></td></tr>
+<tr><td>3 つまとめて確認</td><td><code>systemctl status 'ursus-*'</code></td></tr>
+<tr><td>起動状態だけ簡潔に</td><td><code>systemctl is-active ursus-sensor ursus-detector ursus-ui</code></td></tr>
+<tr><td>ライブログ追跡</td><td><code>journalctl -u ursus-sensor -f</code></td></tr>
+<tr><td>3 サービスのログをまとめて</td><td><code>journalctl -u ursus-sensor -u ursus-detector -u ursus-ui -f</code></td></tr>
+<tr><td>過去 5 分のログ</td><td><code>journalctl -u ursus-sensor --since "5 min ago"</code></td></tr>
+<tr><td>JSON ログを生で読む</td><td><code>journalctl -u ursus-sensor -o cat</code> (URSUS の JSON 1 行ログがそのまま出る)</td></tr>
+<tr><td>エラーだけ抽出</td><td><code>journalctl -u ursus-sensor -p err</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="systemd-uninstall">アンインストール</h3>
+
+<pre><code><span class="tk-com"># 既定: data / config.yml / rules / quarantine を残してコードのみ削除</span>
+$ <span class="tk-kw">sudo</span> /opt/ursus/scripts/uninstall.sh
+
+<span class="tk-com"># 完全削除 (data / config.yml / rules / quarantine / ursus ユーザーまで消す)</span>
+$ <span class="tk-kw">sudo</span> /opt/ursus/scripts/uninstall.sh --purge</code></pre>
+
+<h3 id="systemd-layout">インストールレイアウト</h3>
+
+<div class="diagram">
+<pre>
+/opt/ursus/                  root:root  755
+├── src/                     # コード本体
+├── rules/                   # 検知ルール YAML
+├── systemd/                 # service ファイル原本 (参照用に同梱)
+├── scripts/                 # start.sh / stop.sh / uninstall.sh / measure_resources.py
+├── .venv/                   # 仮想環境 (pip install -e で配置)
+├── config.yml               root:ursus 660  # ui (ursus) が Settings 経由で書く
+└── data/                    root:ursus 770  # sensor が書き、detector/ui が読む
+    ├── edr.db               root:ursus 660  (UMask=0027 で sensor が作成)
+    ├── edr.db-wal
+    └── edr.db-shm
+
+/var/quarantine/ursus/       root:root  700  # detector の quarantine_file 移動先
+
+/etc/systemd/system/
+├── ursus-sensor.service
+├── ursus-detector.service
+└── ursus-ui.service
+</pre>
+</div>
+
+<h3 id="systemd-hardening">サンドボックス設定</h3>
+
+<p>
+各 unit は systemd のサンドボックス機能で隔離されている。主要な設定:
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>directive</th><th>sensor</th><th>detector</th><th>ui</th></tr></thead>
+<tbody>
+<tr><td><code>User</code></td><td>root</td><td>root</td><td>ursus</td></tr>
+<tr><td><code>NoNewPrivileges</code></td><td>true</td><td>true</td><td>true</td></tr>
+<tr><td><code>ProtectSystem</code></td><td>strict</td><td>full</td><td>strict</td></tr>
+<tr><td><code>ProtectHome</code></td><td>read-only</td><td>(none)</td><td>true</td></tr>
+<tr><td><code>ReadWritePaths</code></td><td>/opt/ursus/data</td><td>—</td><td>/opt/ursus</td></tr>
+<tr><td><code>PrivateTmp</code></td><td>false</td><td>false</td><td>true</td></tr>
+<tr><td><code>UMask</code></td><td>0027</td><td>—</td><td>—</td></tr>
+<tr><td><code>MemoryMax</code></td><td>512M</td><td>256M</td><td>256M</td></tr>
+<tr><td><code>TasksMax</code></td><td>200</td><td>50</td><td>50</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>主要な設定の根拠</h4>
+
+<ul>
+  <li>
+    <strong><code>PrivateTmp=false</code> (sensor / detector)</strong>:
+    <code>PrivateTmp=true</code> は unit ごとに名前空間付きの <code>/tmp</code>
+    を割り当てるため、他プロセスが本来の <code>/tmp</code> で行う活動を観測 (sensor)
+    / 操作 (detector の quarantine_file) できなくなる。
+  </li>
+  <li>
+    <strong><code>UMask=0027</code> (sensor)</strong>:
+    SQLite の WAL/SHM ファイルが <code>root:ursus 660</code> の権限で
+    作成されるよう調整するため。これがないと UI (ursus user) が DB を読めない。
+  </li>
+  <li>
+    <strong><code>ProtectHome=read-only</code> (sensor)</strong>:
+    file_collector が <code>/home</code> 配下を inotify で監視するため
+    マウント自体は必要。読み取り専用で十分。
+  </li>
+  <li>
+    <strong><code>ProtectHome</code> 未指定 (detector)</strong>:
+    quarantine_file の対象が <code>/home</code> 配下になる場合があるため。
+  </li>
+  <li>
+    <strong><code>ProtectSystem=full</code> (detector)</strong>:
+    <code>strict</code> にすると <code>/tmp</code> 等への書込ができず
+    quarantine_file が失敗する。<code>full</code> なら <code>/usr</code> /
+    <code>/boot</code> / <code>/etc</code> のみ ro。
+  </li>
+  <li>
+    <strong><code>ReadWritePaths=/opt/ursus</code> (ui)</strong>:
+    Settings からの保存で <code>config.yml.tmp</code> をディレクトリ内に
+    作成 → <code>rename</code> するアトミック書込のため、ファイル単体ではなく
+    ディレクトリへの書込権が必要。実体ファイルレベルの書込制御は
+    <code>chmod 660 config.yml</code> 側で担保。
+  </li>
+</ul>
+
+<h2 id="apply">設定変更を反映する</h2>
+
+<p>
+config.yml を保存しただけではプロセスは新しい設定を読みません。
+反映させるには各プロセスを再起動します。
+</p>
+
+<h3 id="apply-systemd">systemd で動かしている場合</h3>
+
+<pre><code><span class="tk-com"># sensor の watch_paths を変更したら sensor だけ再起動</span>
+$ <span class="tk-kw">sudo</span> systemctl restart ursus-sensor
+
+<span class="tk-com"># 全部まとめて再起動</span>
+$ <span class="tk-kw">sudo</span> systemctl restart ursus-sensor ursus-detector ursus-ui
+
+<span class="tk-com"># または stop+start ラッパーで</span>
+$ <span class="tk-kw">sudo</span> /opt/ursus/scripts/stop.sh
+$ <span class="tk-kw">sudo</span> /opt/ursus/scripts/start.sh</code></pre>
+
+<h3 id="apply-manual">手動起動の場合</h3>
+
+<p>
+各ターミナルで <kbd>Ctrl-C</kbd> → 再度コマンド実行。
+</p>
+
+<pre><code>$ <span class="tk-kw">sudo</span> .venv/bin/ursus-sensor   --config config.yml
+$ .venv/bin/ursus-detector  --config config.yml
+$ .venv/bin/ursus-ui        --config config.yml</code></pre>
+
+<h2 id="yaml-tips">YAML 直接編集の注意点</h2>
+
+<h3>インデント</h3>
+
+<p>
+YAML はインデントが意味を持ちます。<strong>タブは使わずスペース 2 つ</strong>に統一してください。
+</p>
+
+<h3>リスト記法</h3>
+
+<p>
+list&lt;string&gt; のフィールドは <code>-</code> プレフィックスで列挙します。Settings ページの textarea で 1 行 1 値を入れると、保存時にこの形式に変換されます。
+</p>
+
+<pre><code>watch_paths:
+  - /etc
+  - /tmp</code></pre>
+
+<h3>特殊文字を含むパターン</h3>
+
+<p>
+glob (<code>*</code>) や正規表現で <code>:</code> や <code>#</code> を含む値はクォートが必要です。
+</p>
+
+<pre><code>exclude_patterns:
+  - <span class="tk-str">"*.swp"</span>
+  - <span class="tk-str">"*/.cache/*"</span></code></pre>
+
+<h3>コメント</h3>
+
+<p>
+<code>#</code> 以降がコメント。手書きで残しても、<strong>Settings ページから保存すると URSUS の正規コメントに置き換わります</strong>。コメントを死守したい場合は直接編集を続けてください。
+</p>
+
+<h2 id="trouble">トラブルシューティング</h2>
+
+<h3>Detector / UI が起動直後に終了する</h3>
+
+<p>
+config.yml の Pydantic バリデーションに失敗していることが多いです。エラーメッセージを確認してください:
+</p>
+
+<pre><code>pydantic_core._pydantic_core.ValidationError: 1 validation error for Config
+ui.bind_host
+  Value error, ui.bind_host must be loopback; got <span class="tk-str">'0.0.0.0'</span>
+    [type=value_error, input_value=<span class="tk-str">'0.0.0.0'</span>, input_type=str]</code></pre>
+
+<p>
+このケースは <code>ui.bind_host</code> をループバックに戻せば解消します。
+</p>
+
+<h3>Settings から保存ボタンが反応しない</h3>
+
+<p>
+ブラウザの開発者ツールで Console / Network タブを確認してください。
+</p>
+
+<ul>
+  <li><code>POST /settings</code> が 400 → 入力エラー (バナーにも表示される)</li>
+  <li><code>POST /settings</code> が 500 → サーバ側エラー (ui プロセスのログ確認)</li>
+  <li>そもそもリクエストが飛んでいない → JS エラー</li>
+</ul>
+
+<h3>config.yml が「読み取り専用 DB」エラーで保存できない</h3>
+
+<p>
+ui プロセスを root ではなく一般ユーザーで動かしていて、config.yml が root 所有になっているケース:
+</p>
+
+<pre><code>$ <span class="tk-kw">sudo</span> chown $USER:$USER config.yml</code></pre>
+
+<h3>変更を保存したのに動作が変わらない</h3>
+
+<p>
+プロセス再起動を忘れていないか確認してください。Settings ページの amber バナー、および各プロセスのログ最初の数行で、現在ロード中の値を確認できます。
+</p>
+
+<h2 id="next">関連ドキュメント</h2>
+<ul>
+  <li><a href="quickstart.html">インストールと実行</a> — 最初の起動と最初のアラート</li>
+  <li><a href="detector/rules.html">検知ルールの定義</a> — config.yml ではなく <code>rules/*.yml</code> でルール記述</li>
+  <li><a href="detector/responses.html">レスポンス動作</a> — allowed_actions の各アクション詳細</li>
+</ul>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+</article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

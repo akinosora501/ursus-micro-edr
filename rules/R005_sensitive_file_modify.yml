@@ -1,0 +1,17 @@
+id: R005
+title: 機密ファイルの変更 (/etc/shadow 等)
+description: /etc/shadow や /etc/passwd などの機密ファイルに対する変更・作成・削除を検知します。
+severity: high
+event_type: file
+condition:
+  all:
+    - field: file_path
+      op: regex
+      value: "^/etc/(shadow|passwd|gshadow|group)$"
+    - field: file_op
+      op: in
+      value: [modify, create, delete, move]
+response:
+  - alert
+mitre:
+  - T1003.008

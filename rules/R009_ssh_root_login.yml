@@ -1,0 +1,21 @@
+id: R009
+title: SSH での root ユーザログイン試行
+description: |
+  失敗・成功問わず root ユーザに対する SSH ログイン試行を検知する。
+  本番環境で PermitRootLogin no が設定されていれば「失敗」が、
+  no が外れていれば「成功」も含めて関心対象。
+severity: high
+event_type: auth
+condition:
+  all:
+    - field: auth_user
+      op: eq
+      value: root
+    - field: raw.service
+      op: eq
+      value: sshd
+response:
+  - alert
+mitre:
+  - T1110
+  - T1078.003

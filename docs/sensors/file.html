@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>File Collector · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="../index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="../assets/ursus_logo.png" alt="URSUS" class="h-7 w-auto">
+        <span class="text-white font-bold text-sm tracking-wide">URSUS</span>
+        <span class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../index.html"        class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Introduction</a></li>
+            <li><a href="../quickstart.html"   class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Quick Start</a></li>
+            <li><a href="../architecture.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Architecture</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="process.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Process Collector</a></li>
+            <li><a href="file.html" class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">File Collector</a></li>
+            <li><a href="network.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Network Collector</a></li>
+            <li><a href="auth.html"    class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Auth Collector</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../detector/pipeline.html"  class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Pipeline</a></li>
+            <li><a href="../detector/rules.html"     class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Rules DSL</a></li>
+            <li><a href="../detector/responses.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Responses</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../operations.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Operations</a></li>
+            <li><a href="../glossary.html"   class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Glossary</a></li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">URSUS · MIT License</div>
+    </aside>
+
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100" aria-label="メニュー">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a href="../index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="../assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1><span class="tag-pill file">file</span> File Collector</h1>
+<p class="subtitle">inotify (watchdog) によるファイル変更のリアルタイム検知</p>
+
+<h2 id="goal">目的</h2>
+
+<p>
+攻撃者の永続化やデータ改竄は、最終的に「ファイル書き込み」として表面化します。
+代表的な観測対象:
+</p>
+
+<ul>
+  <li><code>/etc/passwd</code> や <code>/etc/shadow</code> への書き込み (バックドアアカウント追加)</li>
+  <li><code>~/.ssh/authorized_keys</code> の改変 (SSH 鍵による持続的アクセス)</li>
+  <li><code>/etc/cron.d/</code>, <code>/etc/systemd/system/</code> への投入 (定期実行による永続化)</li>
+  <li><code>/tmp</code> や <code>/var/tmp</code> 配下への payload 配置</li>
+  <li><code>~/.bash_history</code> や <code>/var/log/*</code> の消去 (痕跡隠蔽)</li>
+</ul>
+
+<h2 id="approach">採用方式: inotify (watchdog 経由)</h2>
+
+<p>
+Linux でファイル変更を観測する選択肢:
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>方式</th><th>PID/Process 取得</th><th>必要権限</th><th>備考</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>inotify (採用)</strong></td>
+  <td>✗</td>
+  <td>不要</td>
+  <td>カーネルの fs 通知。watchdog ライブラリで Python から扱う</td>
+</tr>
+<tr>
+  <td>fanotify</td>
+  <td>◎ (PID/exe path)</td>
+  <td>CAP_SYS_ADMIN</td>
+  <td>5.1+ で <code>FAN_REPORT_FID</code>。Python 標準には無く ctypes 必要</td>
+</tr>
+<tr>
+  <td>auditd file watch</td>
+  <td>◎</td>
+  <td>root</td>
+  <td><code>auditctl -w /etc/passwd -p wa</code> で監視ルール設定</td>
+</tr>
+<tr>
+  <td>eBPF (LSM hook)</td>
+  <td>◎ + コンテナ情報</td>
+  <td>CAP_BPF</td>
+  <td>商用 EDR の主流実装。bcc / libbpf 等への依存が必要</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="warn">
+<strong>inotify は "誰が変更したか" を返さない</strong>
+<p>
+URSUS の現在の実装では、<code>/etc/passwd</code> が改変されたことは分かりますが
+「どのプロセスが書き込んだか」は分かりません。inotify 自体がその情報を
+返さないからです。fanotify / auditd / eBPF への発展はこの制約を解消する
+ためのものです。
+</p>
+</div>
+
+<h2 id="inotify">inotify とは</h2>
+
+<p>
+<strong>inotify</strong> は Linux 2.6.13 から導入されたファイルシステム
+通知機構です。<code>inotify_init()</code> で得たファイルディスクリプタに対して
+<code>inotify_add_watch()</code> で監視対象パスを登録すると、その配下で
+ファイルが作成・変更・削除・移動された際にイベントが配信されます。
+</p>
+
+<p>
+イベント種別 (mask):
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>mask</th><th>発火タイミング</th><th>URSUS の扱い</th></tr></thead>
+<tbody>
+<tr><td><code>IN_CREATE</code></td><td>ファイル/dir 作成</td><td>create として記録</td></tr>
+<tr><td><code>IN_MODIFY</code></td><td><code>write(2)</code> ごと（!）</td><td>modify として記録（debounce あり）</td></tr>
+<tr><td><code>IN_CLOSE_WRITE</code></td><td>書き込み用 fd の close</td><td>未使用</td></tr>
+<tr><td><code>IN_DELETE</code></td><td>削除</td><td>delete として記録</td></tr>
+<tr><td><code>IN_MOVED_FROM/TO</code></td><td>rename(2)</td><td>move として記録 (src + dest)</td></tr>
+<tr><td><code>IN_ATTRIB</code></td><td>chmod/chown</td><td>未使用（SUID 検知は process 経由で行う）</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="watchdog">watchdog ライブラリの位置付け</h2>
+
+<p>
+URSUS は inotify を直接叩くのではなく、Python の
+<a href="https://python-watchdog.readthedocs.io/" target="_blank" rel="noopener">watchdog</a>
+ライブラリを使っています。watchdog は OS 抽象化レイヤを提供し、
+Linux では <code>InotifyEmitter</code>、macOS では FSEvents、Windows では
+ReadDirectoryChangesW を使います。我々が必要なのは Linux 限定なので
+inotify 直叩きでも構わないのですが、コード量を減らすために採用しました。
+</p>
+
+<h2 id="threading">スレッドモデルの注意点</h2>
+
+<div class="diagram">
+<pre>
+   watchdog Observer (別スレッド)         FileCollector.run() (sensor スレッド)
+   ─────────────────────────              ─────────────────────────────────────
+
+   inotify 受信
+        │
+        ▼
+   _FileEventHandler.on_modified()        out_queue.get(timeout=0.5)
+        │                                          │
+        │  out_queue.put(payload)                  │
+        ├─────────────────────────────────────────▶│
+        ▼                                          ▼
+   (続けて受信ループ)                        DB INSERT (sqlite3.Connection)
+</pre>
+<p class="diagram-caption">Observer 側スレッドと DB 書き込みスレッドを Queue で疎結合にする</p>
+</div>
+
+<p>
+watchdog の <code>FileSystemEventHandler</code> のコールバックは Observer の
+別スレッドで呼ばれます。一方 SQLite の接続オブジェクトはスレッドをまたいで
+共有しないのが安全な使い方です。URSUS では <code>queue.Queue</code> を間に
+挟むことで:
+</p>
+
+<ul>
+  <li>Observer スレッドはイベントを Queue に積むだけ</li>
+  <li><code>run()</code> スレッドが Queue から取り出して DB に INSERT</li>
+</ul>
+
+<p>
+これによりロックの取り合いを避け、終了処理（SIGTERM）のときも main スレッドの
+ループ条件で素直に止められます。
+</p>
+
+<h2 id="code">URSUS の実装</h2>
+
+<p>
+ファイル: <code>src/ursus/sensor/file_collector.py</code>
+</p>
+
+<h3 id="handler">イベントハンドラ</h3>
+
+<pre><code><span class="tk-kw">class</span> <span class="tk-typ">_FileEventHandler</span>(FileSystemEventHandler):
+    <span class="tk-kw">def</span> <span class="tk-fn">on_created</span>(self, event):
+        self.<span class="tk-fn">_emit</span>(<span class="tk-str">"create"</span>, event.src_path, event.is_directory)
+
+    <span class="tk-kw">def</span> <span class="tk-fn">on_modified</span>(self, event):
+        <span class="tk-com"># ディレクトリの modified は配下のファイル変更ごとに発火し</span>
+        <span class="tk-com"># ノイズが多いため捨てる。</span>
+        <span class="tk-kw">if</span> event.is_directory: <span class="tk-kw">return</span>
+        <span class="tk-kw">if</span> self.<span class="tk-fn">_is_excluded</span>(event.src_path): <span class="tk-kw">return</span>
+        <span class="tk-kw">if</span> <span class="tk-kw">not</span> self.<span class="tk-fn">_should_emit_modify</span>(event.src_path): <span class="tk-kw">return</span>
+        self._queue.<span class="tk-fn">put</span>({<span class="tk-str">"op"</span>: <span class="tk-str">"modify"</span>, <span class="tk-str">"path"</span>: event.src_path, ...})
+
+    <span class="tk-kw">def</span> <span class="tk-fn">on_deleted</span>(self, event): ...
+    <span class="tk-kw">def</span> <span class="tk-fn">on_moved</span>(self, event):   ...</code></pre>
+
+<h3 id="exclusion">除外パターンと自己フィードバック防止</h3>
+
+<p>
+何も対策しないと URSUS 自体が <code>data/edr.db-wal</code> を秒間数千回更新する
+ので、ファイル監視がそれを拾って無限ループになります。コードでは:
+</p>
+
+<ol>
+  <li><strong>DB ディレクトリは無条件除外</strong>:
+    <code>os.path.realpath</code> で正規化して、watch_path 配下に DB がある
+    場合でも自動的にスキップ。SQLite の WAL/SHM/journal が同一ディレクトリに
+    作られるので、ディレクトリ単位で切れば全部カバーできる。</li>
+  <li><strong>glob パターン除外</strong>:
+    <code>config.yml</code> の <code>exclude_patterns</code> に指定された glob
+    （例: <code>*.swp</code>, <code>*~</code>, <code>*/.cache/*</code>）に
+    マッチするパスを除外。</li>
+</ol>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_is_excluded</span>(self, path):
+    <span class="tk-kw">try</span>:
+        real = os.path.<span class="tk-fn">realpath</span>(path)
+    <span class="tk-kw">except</span> OSError:
+        real = path
+    <span class="tk-kw">for</span> d <span class="tk-kw">in</span> self._exclude_dirs:
+        <span class="tk-kw">if</span> real == d <span class="tk-kw">or</span> real.<span class="tk-fn">startswith</span>(d + os.sep):
+            <span class="tk-kw">return</span> <span class="tk-kw">True</span>
+    name = os.path.<span class="tk-fn">basename</span>(path)
+    <span class="tk-kw">for</span> pattern <span class="tk-kw">in</span> self._exclude_patterns:
+        <span class="tk-kw">if</span> fnmatch.<span class="tk-fn">fnmatch</span>(name, pattern) <span class="tk-kw">or</span> fnmatch.<span class="tk-fn">fnmatch</span>(path, pattern):
+            <span class="tk-kw">return</span> <span class="tk-kw">True</span>
+    <span class="tk-kw">return</span> <span class="tk-kw">False</span></code></pre>
+
+<h3 id="debounce">modify の重複抑制 (debounce)</h3>
+
+<p>
+inotify の <code>IN_MODIFY</code> はファイルへの <code>write(2)</code> 1 回ごとに
+発火します。エディタが 1 ファイル保存しただけで数十イベント出ることが
+珍しくありません。URSUS は同一 path への連続 modify を
+<code>modify_debounce_sec</code> 窓内で 1 件にまとめます。
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_should_emit_modify</span>(self, path):
+    <span class="tk-kw">if</span> self._debounce_sec &lt;= <span class="tk-num">0</span>:
+        <span class="tk-kw">return</span> <span class="tk-kw">True</span>
+    now = time.<span class="tk-fn">monotonic</span>()
+    <span class="tk-kw">with</span> self._lock:
+        last = self._last_modify_emit.<span class="tk-fn">get</span>(path)
+        <span class="tk-kw">if</span> last <span class="tk-kw">is not</span> <span class="tk-kw">None</span> <span class="tk-kw">and</span> now - last &lt; self._debounce_sec:
+            <span class="tk-kw">return</span> <span class="tk-kw">False</span>
+        self._last_modify_emit[path] = now
+    <span class="tk-kw">return</span> <span class="tk-kw">True</span></code></pre>
+
+<div class="info">
+<strong>商用 EDR の "file write storm suppression"</strong>
+<p>
+商用 EDR は同様の抑制を「ウィンドウ末で破棄件数 N を 1 件追加で出す」形で
+実装することが多い (leading + trailing summary)。URSUS は実装の単純さを
+優先して leading-only に留めている。トレーリング合成への拡張は容易。
+</p>
+</div>
+
+<h2 id="output">出力されるイベント</h2>
+
+<h3>raw_json</h3>
+
+<pre><code>{
+  <span class="tk-str">"op"</span>: <span class="tk-str">"modify"</span>,
+  <span class="tk-str">"path"</span>: <span class="tk-str">"/etc/passwd"</span>,
+  <span class="tk-str">"is_directory"</span>: <span class="tk-kw">false</span>,
+  <span class="tk-str">"src_path"</span>: <span class="tk-kw">null</span>
+}</code></pre>
+
+<p>
+<code>op</code> は <code>create</code> / <code>modify</code> / <code>delete</code> / <code>move</code>。
+<code>move</code> 時のみ <code>src_path</code> に移動元、<code>path</code> に移動先が入ります。
+</p>
+
+<h3>非正規化カラム</h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>カラム</th><th>例</th></tr></thead>
+<tbody>
+<tr><td><code>file_path</code></td><td><code>/etc/passwd</code></td></tr>
+<tr><td><code>file_op</code></td><td><code>create</code> / <code>modify</code> / <code>delete</code> / <code>move</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="config">設定</h2>
+
+<pre><code><span class="tk-com">sensor:</span>
+  file:
+    enabled: <span class="tk-kw">true</span>
+    watch_paths:                 <span class="tk-com"># 再帰監視するディレクトリ</span>
+      - /etc
+      - /tmp
+      - /var/tmp
+      - /home
+    exclude_patterns:            <span class="tk-com"># glob 除外</span>
+      - <span class="tk-str">"*.swp"</span>
+      - <span class="tk-str">"*~"</span>
+      - <span class="tk-str">"*/.cache/*"</span>
+      - <span class="tk-str">"*/.mozilla/*"</span>
+    modify_debounce_sec: <span class="tk-num">2.0</span>     <span class="tk-com"># 同一 path への連続 modify を抑制</span></code></pre>
+
+<h2 id="tuning">運用上のチューニング</h2>
+
+<h3>watch_paths を絞る</h3>
+
+<p>
+<code>/home</code> 全体を監視するとブラウザキャッシュ・エディタ作業ファイル等で
+数千イベント/秒が出ることがあります。攻撃者の永続化候補を狙い撃ちすると
+精度とノイズのバランスが取れます。
+</p>
+
+<pre><code>watch_paths:
+  - /etc
+  - /etc/cron.d
+  - /etc/cron.daily
+  - /etc/systemd/system
+  - /usr/bin
+  - /usr/sbin
+  - /tmp
+  - /var/tmp
+  <span class="tk-com"># /home 全体ではなく重要パスだけピン留め</span>
+  - /home/user/.ssh
+  - /home/user/.bashrc
+  - /home/user/.profile</code></pre>
+
+<h3>exclude_patterns を厚く</h3>
+
+<p>
+ノイズの多い拡張子・ディレクトリは exclude で叩き落とします:
+</p>
+
+<pre><code>exclude_patterns:
+  - <span class="tk-str">"*.swp"</span>
+  - <span class="tk-str">"*~"</span>
+  - <span class="tk-str">"*.lock"</span>
+  - <span class="tk-str">"*.pyc"</span>
+  - <span class="tk-str">"*/.cache/*"</span>
+  - <span class="tk-str">"*/.mozilla/*"</span>
+  - <span class="tk-str">"*/.git/*"</span>
+  - <span class="tk-str">"*/node_modules/*"</span>
+  - <span class="tk-str">"*/__pycache__/*"</span></code></pre>
+
+<h2 id="limits">制限</h2>
+
+<ul>
+  <li><strong>PID が分からない</strong>: 上述。fanotify / auditd / eBPF へ拡張する余地</li>
+  <li><strong>recursive watch のコスト</strong>:
+    再帰監視は kernel 側で各サブディレクトリごとに watch descriptor を
+    張ります。/home に膨大な dir があると <code>fs.inotify.max_user_watches</code>
+    の上限（デフォルト 8192）に達することがある。</li>
+  <li><strong>NFS / FUSE の挙動差</strong>:
+    一部のネットワークファイルシステムでは inotify が完全には動きません</li>
+</ul>
+
+<h2 id="next">関連ドキュメント</h2>
+<ul>
+  <li><a href="../detector/rules.html#R002">R002 / R003 ルール</a> — file イベントを使った検知例</li>
+  <li><a href="auth.html">Auth Collector</a> — 認証ログの監視</li>
+</ul>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+</article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

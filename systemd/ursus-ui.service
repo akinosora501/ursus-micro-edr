@@ -1,0 +1,45 @@
+[Unit]
+Description=URSUS Micro EDR - UI
+Documentation=https://github.com/<user>/ursus
+After=ursus-detector.service
+Wants=ursus-detector.service
+
+[Service]
+Type=simple
+User=ursus
+Group=ursus
+WorkingDirectory=/opt/ursus
+
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/ursus/.venv/bin/ursus-ui --config /opt/ursus/config.yml
+
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=0
+
+# --- サンドボックス -----------------------------------------------------
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+# /opt/ursus 全体を書込可にする
+# (config.yml の Settings 経由更新には config.yml.tmp 作成のため
+# ディレクトリへの書込権が必要。実際の書込はファイルシステム権限で
+# config.yml と data/ のみに制限される)
+ReadWritePaths=/opt/ursus
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LockPersonality=true
+
+# --- リソース上限 -------------------------------------------------------
+MemoryMax=256M
+TasksMax=50
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

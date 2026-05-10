@@ -1,0 +1,17 @@
+id: R003
+title: Netcatによるリバースシェル/バインドシェルの実行
+description: nc (netcat) コマンドに -e または -c オプションを付与し、外部に対してシェルを公開・接続する挙動を検知します。
+severity: high
+event_type: process
+condition:
+  all:
+    - field: process_name
+      op: in
+      value: [nc, ncat, netcat]
+    - field: cmdline
+      op: regex
+      value: "-(e|c)\\s+(/bin/)?(bash|sh|zsh|dash)"
+response:
+  - alert
+mitre:
+  - T1059

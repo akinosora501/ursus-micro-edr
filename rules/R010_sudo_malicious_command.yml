@@ -1,0 +1,20 @@
+id: R010
+title: sudo 経由での悪意あるコマンド実行
+description: |
+  sudo で実行されたコマンドのうち、永続化や権限昇格に使われやすい
+  ものを検知する（chmod u+s, useradd, passwd, visudo 等）。
+severity: medium
+event_type: auth
+condition:
+  all:
+    - field: raw.service
+      op: eq
+      value: sudo
+    - field: raw.command
+      op: regex
+      value: "(chmod\\s+(u\\+s|4[0-7]{3})|useradd|passwd(\\s|$)|visudo|crontab)"
+response:
+  - alert
+mitre:
+  - T1548.003
+  - T1136.001

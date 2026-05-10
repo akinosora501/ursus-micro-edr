@@ -1,0 +1,13 @@
+id: R008
+title: 不審なポートへの外部通信 (C2通信の疑い)
+severity: high
+event_type: network
+condition:
+  all:
+    - field: remote_port
+      op: in
+      value: [4444, 31337]
+response:
+  - alert
+mitre:
+  - T1043

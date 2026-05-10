@@ -1,0 +1,68 @@
+# ursus configuration
+database:
+  path: ./data/edr.db
+  retention_days: 3
+
+sensor:
+  hostname: auto
+
+  # プロセス監視: netlink (PROC_EVENTS / cn_proc) で exec(2) を購読する。
+  # root (CAP_NET_ADMIN) が必要。
+  process:
+    enabled: true
+
+  # ファイル監視: watchdog (inotify) でディレクトリ再帰監視。
+  file:
+    enabled: true
+    watch_paths:
+      - /etc
+      - /tmp
+      - /var/tmp
+      - /home
+    exclude_patterns:
+      - "*.swp"
+      - "*~"
+      - "*/.cache/*"
+      - "*/.mozilla/*"
+    # 同一 path への連続 modify を1ウィンドウに圧縮する秒数（0 で無効）
+    modify_debounce_sec: 2.0
+
+  # ネットワーク監視: psutil で TCP 接続テーブルをポーリング、差分から
+  # 新しい LISTEN / ESTABLISHED を抽出する。
+  network:
+    enabled: true
+    poll_interval_sec: 2.0
+    # 同一 (pid, remote_ip, remote_port) への ESTABLISHED 連発を抑制する秒数（0 で無効）
+    established_debounce_sec: 5.0
+
+  # 認証ログ監視: systemd-journald を journalctl 経由で購読する。
+  # /var/log/auth.log を持たない環境（Arch / 最新 Fedora 等）でも動く。
+  auth:
+    enabled: true
+    journal_units:
+      - ssh.service
+      - sshd.service
+    journal_comms:
+      - sudo
+
+detector:
+  enabled: true
+  poll_interval_sec: 1.0
+  rules_dir: ./rules
+  response:
+    dry_run: true
+    allowed_actions:
+      - alert
+      # - kill_process
+      # - quarantine_file
+      # block_network は誤動作リスクのため恒久無効化されており、ここに
+      # 書いても iptables は呼ばれず response_log に refused 記録のみ残る。
+
+ui:
+  bind_host: 127.0.0.1         # ループバック固定（外部公開禁止）
+  bind_port: 8080
+  events_per_page: 50
+
+logging:
+  level: INFO                  # DEBUG / INFO / WARNING / ERROR
+  format: json                 # json or text

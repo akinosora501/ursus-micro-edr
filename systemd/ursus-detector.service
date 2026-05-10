@@ -1,0 +1,44 @@
+[Unit]
+Description=URSUS Micro EDR - Detector
+Documentation=https://github.com/<user>/ursus
+After=ursus-sensor.service
+Wants=ursus-sensor.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ursus
+
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/ursus/.venv/bin/ursus-detector --config /opt/ursus/config.yml
+
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=0
+OOMScoreAdjust=-1000
+
+# --- サンドボックス -----------------------------------------------------
+NoNewPrivileges=true
+# ProtectSystem=full : /usr, /boot, /efi, /etc を読み取り専用に
+# (strict にすると quarantine_file が /home や /tmp 配下のファイルを移動できなくなる)
+ProtectSystem=full
+# ProtectHome は設定しない (quarantine_file の対象が /home の場合がある)
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+LockPersonality=true
+
+# PrivateTmp=false : quarantine_file が /tmp 配下のファイルを実体と同じ namespace で
+# 操作する必要があるため
+PrivateTmp=false
+
+# --- リソース上限 -------------------------------------------------------
+MemoryMax=256M
+TasksMax=50
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

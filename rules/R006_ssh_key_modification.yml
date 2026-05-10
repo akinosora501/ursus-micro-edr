@@ -1,0 +1,17 @@
+id: R006
+title: SSH公開鍵の不正追加・変更
+description: authorized_keys ファイルの変更を検知し、バックドアとしての永続化の試みを捉えます。
+severity: high
+event_type: file
+condition:
+  all:
+    - field: file_path
+      op: endswith
+      value: "/.ssh/authorized_keys"
+    - field: file_op
+      op: in
+      value: [modify, create, move]
+response:
+  - alert
+mitre:
+  - T1098.004

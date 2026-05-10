@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>レスポンス動作 · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <aside id="sidebar"
+      class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="../index.html"
+        class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="../assets/ursus_logo.png" alt="URSUS" class="h-8 w-auto">
+        <span
+          class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../index.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">URSUSとは</a></li>
+            <li><a href="../quickstart.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">インストールと実行</a>
+            </li>
+            <li><a href="../architecture.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">アーキテクチャ</a>
+            </li>
+            <li><a href="../disclaimer.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">免責事項</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../sensors/mechanisms.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Sensor の仕組み</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="pipeline.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Detector の仕組み</a>
+            </li>
+            <li><a href="rules.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Koguma ルールの定義</a></li>
+            <li><a href="responses.html"
+                class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">レスポンス動作</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../operations.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">設定の変更</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">
+        URSUS · MIT License
+      </div>
+    </aside>
+
+    <!-- ── Content area ─────────────────────────────────────────── -->
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <!-- Mobile header -->
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()"
+          class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label="メニューを開く">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <a href="../index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="../assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1>レスポンス動作</h1>
+<p class="subtitle">アラート発火時に実行されるアクション群と、その安全装置の仕様</p>
+
+<h2 id="overview">概要</h2>
+
+<p>
+ルールがマッチすると <code>alerts</code> 表への INSERT に続いて
+<code>ResponseHandler.dispatch()</code> が呼ばれ、ルールの <code>response</code> に
+列挙されたアクションを順に実行する。各アクションには <strong>許可ゲート</strong>
+（<code>allowed_actions</code>）と <strong>個別の安全装置</strong>（PID / パス / アドレス検査）が
+あり、両方を通過した場合のみ実体が動く。
+</p>
+
+<div class="diagram">
+<pre>
+   alerts.INSERT
+        │
+        ▼
+   ResponseHandler.dispatch(rule, alert_id, event)
+        │
+        │ for each action in rule.response:
+        ▼
+   ┌───────────────────────────────────────────────┐
+   │ ① allowed_actions に含まれているか           │── No ──▶ refused: not in allowed_actions
+   └─────────────┬─────────────────────────────────┘
+                 │ Yes
+                 ▼
+   ┌───────────────────────────────────────────────┐
+   │ ② アクション固有の安全装置                    │── No ──▶ refused: protected ...
+   │  (PID / パス / アドレス検査)                  │
+   └─────────────┬─────────────────────────────────┘
+                 │ Yes
+                 ▼
+   ┌───────────────────────────────────────────────┐
+   │ ③ dry_run か?                                  │── Yes ──▶ response_log に dry_run=1
+   └─────────────┬─────────────────────────────────┘
+                 │ No
+                 ▼
+   ④ 実体の処理 (kill / move / ...)
+        │
+        ▼
+   response_log.INSERT
+</pre>
+</div>
+
+<h2 id="action-list">アクション一覧</h2>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>アクション</th><th>状態</th><th>必要権限</th><th>対象 event_type</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>alert</code></td>
+  <td>有効</td>
+  <td>不要</td>
+  <td>すべて</td>
+</tr>
+<tr>
+  <td><code>kill_process</code></td>
+  <td>有効</td>
+  <td>kill 対象を撃てる権限 (通常 root)</td>
+  <td>process / 他で <code>pid</code> を持つもの</td>
+</tr>
+<tr>
+  <td><code>quarantine_file</code></td>
+  <td>有効</td>
+  <td>対象ファイルへの書込権限 + <code>/var/quarantine/ursus/</code> 作成権限 (通常 root)</td>
+  <td>file</td>
+</tr>
+<tr>
+  <td><code>block_network</code></td>
+  <td><strong>無効化</strong></td>
+  <td>—</td>
+  <td>—</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="dispatch">dispatch のフロー</h2>
+
+<p>
+コード本体: <code>src/ursus/detector/responses.py</code>
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">dispatch</span>(self, conn, rule, alert_id, event):
+    <span class="tk-kw">for</span> action <span class="tk-kw">in</span> rule.response:
+        <span class="tk-kw">if</span> action <span class="tk-kw">not</span> <span class="tk-kw">in</span> self.allowed_actions:
+            self.<span class="tk-fn">_record</span>(conn, alert_id, action, <span class="tk-kw">None</span>, success=<span class="tk-kw">False</span>,
+                         detail=<span class="tk-str">"not in allowed_actions"</span>)
+            <span class="tk-kw">continue</span>
+        handler = ACTIONS.<span class="tk-fn">get</span>(action)
+        <span class="tk-kw">if</span> handler <span class="tk-kw">is</span> <span class="tk-kw">None</span>:
+            self.<span class="tk-fn">_record</span>(conn, alert_id, action, <span class="tk-kw">None</span>, success=<span class="tk-kw">False</span>,
+                         detail=<span class="tk-str">"unknown action"</span>)
+            <span class="tk-kw">continue</span>
+        <span class="tk-kw">try</span>:
+            <span class="tk-fn">handler</span>(self, conn, alert_id, event)
+        <span class="tk-kw">except</span> Exception <span class="tk-kw">as</span> e:
+            self.<span class="tk-fn">_record</span>(conn, alert_id, action, <span class="tk-kw">None</span>, success=<span class="tk-kw">False</span>,
+                         detail=<span class="tk-str">f"error: {e}"</span>)</code></pre>
+
+<p>
+各アクションが投げた例外は dispatch ループで捕捉され、<code>response_log</code> に
+失敗として記録される。1 つのアクションが失敗しても残りのアクションは実行される。
+</p>
+
+<h2 id="allowed-actions">allowed_actions ゲート</h2>
+
+<p>
+<code>config.yml</code> の <code>detector.response.allowed_actions</code> に列挙されたアクション
+だけが実行される。リストにないアクションがルールの <code>response</code> に書かれていても、
+<code>not in allowed_actions</code> として <code>response_log</code> に拒否記録が残る。
+</p>
+
+<pre><code>detector:
+  response:
+    dry_run: <span class="tk-kw">false</span>
+    allowed_actions:
+      - alert
+      - kill_process
+      - quarantine_file</code></pre>
+
+<p>
+これにより「ルール自体は強い response を宣言しているが、運用ポリシー側で alert
+だけ許可する」という運用が可能になる。
+</p>
+
+<h2 id="dry-run">dry_run</h2>
+
+<p>
+<code>detector.response.dry_run: true</code> のとき、各アクションは安全装置を通過した
+あとも実体処理を行わず、<code>response_log</code> に <code>dry_run=1, success=1</code> として
+記録するだけで終える。「実行されていれば何が起きていたか」を UI から確認できる。
+</p>
+
+<p>
+URSUS の既定値は <code>dry_run: true</code>。<code>false</code> に変更すると Detector の起動時に
+警告ログが出る。
+</p>
+
+<pre><code>{<span class="tk-str">"event"</span>: <span class="tk-str">"destructive_actions_enabled"</span>,
+ <span class="tk-str">"actions"</span>: [<span class="tk-str">"kill_process"</span>, <span class="tk-str">"quarantine_file"</span>]}</code></pre>
+
+<h2 id="action-alert">action: <code>alert</code></h2>
+
+<p>
+通知用の "no-op" アクション。<code>response_log</code> に <code>action=alert, success=1,
+detail=event_id=&lt;n&gt;</code> を記録するだけで、外部に何の作用も及ぼさない。
+ほぼ全てのルールで含めることを想定している。
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_action_alert</span>(handler, conn, alert_id, event):
+    handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"alert"</span>, target=<span class="tk-kw">None</span>, success=<span class="tk-kw">True</span>,
+                    detail=<span class="tk-str">f"event_id={event['id']}"</span>)</code></pre>
+
+<h2 id="action-kill">action: <code>kill_process</code></h2>
+
+<p>
+<code>os.kill(pid, SIGTERM)</code> によるプロセス終了。実装は単純な SIGTERM のみで、
+SIGKILL へのフォールバックは行わない。
+</p>
+
+<h3 id="kill-target">対象 PID</h3>
+
+<p>
+イベント行の <code>pid</code> 非正規化カラムを使う。process / network / auth イベントの
+いずれでも <code>pid</code> がセットされていれば対象になりうる。
+</p>
+
+<h3 id="kill-guards">安全装置</h3>
+
+<p>
+以下のいずれかに該当する PID は <strong>拒否</strong>される。実体は呼ばれず、
+<code>response_log</code> に <code>refused: protected pid (&lt;pid&gt;)</code> が記録される。
+</p>
+
+<ul>
+  <li><code>pid &lt;= 1</code> (init / kernel 由来)</li>
+  <li><code>pid == os.getpid()</code> (Detector 自身)</li>
+  <li><code>pid == os.getppid()</code> (Detector の親プロセス。systemd 等の保険)</li>
+</ul>
+
+<h3 id="kill-impl">実装</h3>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_action_kill_process</span>(handler, conn, alert_id, event):
+    pid = event[<span class="tk-str">"pid"</span>]
+    <span class="tk-kw">if</span> <span class="tk-kw">not</span> <span class="tk-fn">_is_safe_to_kill_pid</span>(pid):
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"kill_process"</span>, <span class="tk-fn">str</span>(pid), <span class="tk-kw">False</span>,
+                        <span class="tk-str">f"refused: protected pid ({pid})"</span>)
+        <span class="tk-kw">return</span>
+    <span class="tk-kw">if</span> handler.dry_run:
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"kill_process"</span>, <span class="tk-fn">str</span>(pid), <span class="tk-kw">True</span>, <span class="tk-str">"dry_run"</span>)
+        <span class="tk-kw">return</span>
+    <span class="tk-kw">try</span>:
+        os.<span class="tk-fn">kill</span>(pid, signal_mod.SIGTERM)
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"kill_process"</span>, <span class="tk-fn">str</span>(pid), <span class="tk-kw">True</span>, <span class="tk-str">"SIGTERM"</span>)
+    <span class="tk-kw">except</span> ProcessLookupError:
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"kill_process"</span>, <span class="tk-fn">str</span>(pid), <span class="tk-kw">False</span>, <span class="tk-str">"no such process"</span>)
+    <span class="tk-kw">except</span> PermissionError <span class="tk-kw">as</span> e:
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"kill_process"</span>, <span class="tk-fn">str</span>(pid), <span class="tk-kw">False</span>, <span class="tk-fn">str</span>(e))</code></pre>
+
+<h3 id="kill-race">レース条件</h3>
+
+<p>
+プロセス起動の検知から <code>os.kill</code> 発射までの間に対象が既に終了している場合は
+<code>ProcessLookupError</code> を捕捉し、<code>refused</code> ではなく
+<code>success=0, detail=no such process</code> として記録する。
+</p>
+
+<h2 id="action-quarantine">action: <code>quarantine_file</code></h2>
+
+<p>
+対象ファイルを <code>chmod 000</code> したうえで <code>/var/quarantine/ursus/</code> 配下に
+移動する。基本的に file イベント用。
+</p>
+
+<h3 id="quarantine-target">対象パス</h3>
+
+<p>
+イベント行の <code>file_path</code> 非正規化カラムを使う。<code>/etc/passwd</code> 等の重要パスを
+誤って隔離するとシステム破壊につながるため、安全装置で防止する。
+</p>
+
+<h3 id="quarantine-guards">安全装置</h3>
+
+<p>
+<code>os.path.realpath()</code> でシンボリックリンクを解決した正規パスが、以下の
+プレフィックスのいずれかに合致した場合は拒否する (<code>refused: protected
+system path</code>)。
+</p>
+
+<pre><code>_PROTECTED_PATH_PREFIXES = (
+    <span class="tk-str">"/etc/passwd"</span>, <span class="tk-str">"/etc/shadow"</span>, <span class="tk-str">"/etc/group"</span>, <span class="tk-str">"/etc/gshadow"</span>,
+    <span class="tk-str">"/etc/sudoers"</span>, <span class="tk-str">"/etc/hosts"</span>, <span class="tk-str">"/etc/resolv.conf"</span>, <span class="tk-str">"/etc/fstab"</span>,
+    <span class="tk-str">"/bin/"</span>, <span class="tk-str">"/sbin/"</span>, <span class="tk-str">"/usr/bin/"</span>, <span class="tk-str">"/usr/sbin/"</span>,
+    <span class="tk-str">"/lib/"</span>, <span class="tk-str">"/lib64/"</span>, <span class="tk-str">"/usr/lib/"</span>, <span class="tk-str">"/usr/lib64/"</span>,
+    <span class="tk-str">"/boot/"</span>, <span class="tk-str">"/proc/"</span>, <span class="tk-str">"/sys/"</span>, <span class="tk-str">"/dev/"</span>, <span class="tk-str">"/run/"</span>,
+)</code></pre>
+
+<p>
+末尾スラッシュ付きはディレクトリ配下の前方一致、無印は完全一致または
+<code>prefix + "/"</code> 配下のいずれか。
+</p>
+
+<h3 id="quarantine-impl">実装</h3>
+
+<pre><code>QUARANTINE_DIR = Path(<span class="tk-str">"/var/quarantine/ursus"</span>)
+
+<span class="tk-kw">def</span> <span class="tk-fn">_action_quarantine_file</span>(handler, conn, alert_id, event):
+    path = event[<span class="tk-str">"file_path"</span>]
+    <span class="tk-kw">if</span> <span class="tk-kw">not</span> path:
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"quarantine_file"</span>, <span class="tk-kw">None</span>, <span class="tk-kw">False</span>, <span class="tk-str">"no file_path"</span>)
+        <span class="tk-kw">return</span>
+    <span class="tk-kw">if</span> <span class="tk-kw">not</span> <span class="tk-fn">_is_safe_to_quarantine</span>(path):
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"quarantine_file"</span>, path, <span class="tk-kw">False</span>,
+                        <span class="tk-str">"refused: protected system path"</span>)
+        <span class="tk-kw">return</span>
+    <span class="tk-kw">if</span> handler.dry_run:
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"quarantine_file"</span>, path, <span class="tk-kw">True</span>, <span class="tk-str">"dry_run"</span>)
+        <span class="tk-kw">return</span>
+    <span class="tk-kw">try</span>:
+        QUARANTINE_DIR.<span class="tk-fn">mkdir</span>(parents=<span class="tk-kw">True</span>, exist_ok=<span class="tk-kw">True</span>)
+        os.<span class="tk-fn">chmod</span>(path, <span class="tk-num">0o000</span>)
+        dest = QUARANTINE_DIR / Path(path).name
+        shutil.<span class="tk-fn">move</span>(path, dest)
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"quarantine_file"</span>, path, <span class="tk-kw">True</span>,
+                        <span class="tk-str">f"moved to {dest}"</span>)
+    <span class="tk-kw">except</span> Exception <span class="tk-kw">as</span> e:
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"quarantine_file"</span>, path, <span class="tk-kw">False</span>, <span class="tk-fn">str</span>(e))</code></pre>
+
+<h3 id="quarantine-collision">同名ファイルの衝突</h3>
+
+<p>
+<code>/var/quarantine/ursus/&lt;basename&gt;</code> に既存ファイルがある場合、
+<code>shutil.move</code> は上書きする。タイムスタンプ等を含めた一意化は実装していない。
+同じ basename の隔離が複数回起きると 2 つ目が 1 つ目を上書きする。
+</p>
+
+<h2 id="action-block">action: <code>block_network</code></h2>
+
+<div class="warn">
+<strong>本ビルドでは恒久的に無効化されている</strong>
+<p>
+ルール側で <code>response: [block_network]</code> を指定しても <code>iptables</code> は呼ばれず、
+<code>response_log</code> に <code>refused: feature permanently disabled in this build</code>
+が記録されるのみ。
+</p>
+</div>
+
+<p>
+無効化の理由はループバック断による操作不能化 (UI 自身、systemd-resolved、
+ローカル DB アクセスを巻き込む可能性) を避けるため。再有効化したい場合は
+git 履歴から旧実装を戻すこと。旧実装に含まれていた最低限のガード:
+</p>
+
+<ul>
+  <li>ループバック (127.0.0.0/8, ::1) を拒否</li>
+  <li>リンクローカル (169.254.0.0/16, fe80::/10) を拒否</li>
+  <li>未指定 (0.0.0.0, ::) を拒否</li>
+  <li>マルチキャストを拒否</li>
+</ul>
+
+<p>
+旧実装は無効化された IP 以外を <code>iptables -A OUTPUT -d &lt;ip&gt; -j DROP</code> で
+ブロックしていた。
+</p>
+
+<h2 id="response-log">response_log の構造</h2>
+
+<p>
+全アクションの実行結果は <code>response_log</code> 表に書き込まれる。UI のアラート詳細
+画面で表示される。
+</p>
+
+<pre><code><span class="tk-kw">CREATE TABLE</span> response_log (
+  id           <span class="tk-typ">INTEGER PRIMARY KEY AUTOINCREMENT</span>,
+  timestamp    <span class="tk-typ">REAL NOT NULL</span>,
+  alert_id     <span class="tk-typ">INTEGER NOT NULL</span> <span class="tk-kw">REFERENCES</span> alerts(id),
+  action       <span class="tk-typ">TEXT NOT NULL</span>,       <span class="tk-com">-- alert / kill_process / quarantine_file / block_network</span>
+  target       <span class="tk-typ">TEXT</span>,                <span class="tk-com">-- PID / file path / IP 等</span>
+  dry_run      <span class="tk-typ">INTEGER NOT NULL</span>,    <span class="tk-com">-- 0 / 1</span>
+  success      <span class="tk-typ">INTEGER NOT NULL</span>,    <span class="tk-com">-- 0 / 1</span>
+  detail       <span class="tk-typ">TEXT</span>                 <span class="tk-com">-- "SIGTERM" / "moved to /var/quarantine/ursus/foo" / "refused: ..." 等</span>
+);</code></pre>
+
+<h3 id="detail-strings">detail に入る代表的な文字列</h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>action</th><th>success</th><th>dry_run</th><th>detail 例</th></tr></thead>
+<tbody>
+<tr><td>alert</td><td>1</td><td>—</td><td><code>event_id=12345</code></td></tr>
+<tr><td>kill_process</td><td>1</td><td>0</td><td><code>SIGTERM</code></td></tr>
+<tr><td>kill_process</td><td>1</td><td>1</td><td><code>dry_run</code></td></tr>
+<tr><td>kill_process</td><td>0</td><td>—</td><td><code>refused: protected pid (1)</code></td></tr>
+<tr><td>kill_process</td><td>0</td><td>0</td><td><code>no such process</code></td></tr>
+<tr><td>quarantine_file</td><td>1</td><td>0</td><td><code>moved to /var/quarantine/ursus/foo.sh</code></td></tr>
+<tr><td>quarantine_file</td><td>0</td><td>—</td><td><code>refused: protected system path</code></td></tr>
+<tr><td>block_network</td><td>0</td><td>—</td><td><code>refused: feature permanently disabled in this build</code></td></tr>
+<tr><td>(any)</td><td>0</td><td>—</td><td><code>not in allowed_actions</code></td></tr>
+<tr><td>(any)</td><td>0</td><td>—</td><td><code>error: &lt;exception message&gt;</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="extending">アクションを追加する</h2>
+
+<p>
+新しいアクションは <code>responses.py</code> に関数を追加し、<code>ACTIONS</code> 辞書に
+登録する。
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_action_my_custom</span>(handler, conn, alert_id, event):
+    target = event[<span class="tk-str">"file_path"</span>]
+    <span class="tk-com"># 安全装置を必要なら自前で実装</span>
+    <span class="tk-kw">if</span> handler.dry_run:
+        handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"my_custom"</span>, target, <span class="tk-kw">True</span>, <span class="tk-str">"dry_run"</span>)
+        <span class="tk-kw">return</span>
+    <span class="tk-com"># 実体の処理</span>
+    ...
+    handler.<span class="tk-fn">_record</span>(conn, alert_id, <span class="tk-str">"my_custom"</span>, target, <span class="tk-kw">True</span>, <span class="tk-str">"done"</span>)
+
+
+ACTIONS = {
+    <span class="tk-str">"alert"</span>: _action_alert,
+    <span class="tk-str">"kill_process"</span>: _action_kill_process,
+    <span class="tk-str">"quarantine_file"</span>: _action_quarantine_file,
+    <span class="tk-str">"block_network"</span>: _action_block_network,
+    <span class="tk-str">"my_custom"</span>: _action_my_custom,            <span class="tk-com"># ← 追加</span>
+}</code></pre>
+
+<p>
+追加後は <code>config.yml</code> の <code>allowed_actions</code> に名前を加え、ルール側の
+<code>response</code> でも参照できるようになる。
+</p>
+
+<h2 id="next">関連ドキュメント</h2>
+
+<ul>
+  <li><a href="rules.html">検知ルールの定義</a> — response の宣言場所</li>
+  <li><a href="../operations.html#response">設定の変更: response 設定</a> — dry_run / allowed_actions の運用</li>
+</ul>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+</article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>検知ルールの定義 · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <aside id="sidebar"
+      class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="../index.html"
+        class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="../assets/ursus_logo.png" alt="URSUS" class="h-8 w-auto">
+        <span
+          class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../index.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">URSUSとは</a></li>
+            <li><a href="../quickstart.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">インストールと実行</a>
+            </li>
+            <li><a href="../architecture.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">アーキテクチャ</a>
+            </li>
+            <li><a href="../disclaimer.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">免責事項</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../sensors/mechanisms.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Sensor の仕組み</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="pipeline.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Detector の仕組み</a>
+            </li>
+            <li><a href="rules.html"
+                class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">Koguma ルールの定義</a></li>
+            <li><a href="responses.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">レスポンス動作</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../operations.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">設定の変更</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">
+        URSUS · MIT License
+      </div>
+    </aside>
+
+    <!-- ── Content area ─────────────────────────────────────────── -->
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <!-- Mobile header -->
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()"
+          class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label="メニューを開く">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <a href="../index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="../assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1>Koguma ルールの定義</h1>
+<p class="subtitle">YAML で記述する検知条件の文法と評価セマンティクスについて解説します</p>
+
+<h2 id="overview">概要</h2>
+
+<p>
+URSUS の検知ロジックは、<code>rules/</code> ディレクトリ配下に <code>R&lt;NNN&gt;_&lt;name&gt;.yml</code>
+という形式で配置される、<strong>Koguma</strong> と呼ばれる YAML ファイルによって定義され、
+1 つのファイルが 1 つのルールに対応しています。
+Detector は起動時に <code>rules/*.yml</code> をすべて読み込み、バリデーション（必須フィールドの有無、ID 形式、未知の演算子、ツリーの深さなど）を通過した Koguma のみを評価対象としてロードします。
+</p>
+
+<p>
+Koguma を追加する際の一般的なワークフローは以下の通りです：
+</p>
+
+<ol>
+  <li><code>rules/</code> ディレクトリに YAML ファイルを配置します</li>
+  <li><code>ursus-detector</code> プロセスを再起動します</li>
+  <li>条件に合致するイベントが発生すると、<code>alerts</code> テーブルにレコードが追加されます</li>
+</ol>
+
+<h2 id="schema">Koguma のスキーマ</h2>
+
+<pre><code>id: R001                        <span class="tk-com"># 必須。一意である必要があります（形式: ^R\d{3}$）</span>
+title: <span class="tk-str">"短い人間可読タイトル"</span>     <span class="tk-com"># 必須。ルールの内容を簡潔に示します</span>
+description: |                  <span class="tk-com"># 任意。複数行での記述が可能です</span>
+  ルールの意図、参考リンク、誤検知の傾向などを記載します
+severity: high                  <span class="tk-com"># 必須。low / medium / high / critical から選択します</span>
+event_type: process             <span class="tk-com"># 必須。評価対象のイベント種別を指定します</span>
+condition:                      <span class="tk-com"># 必須。検知条件（後述）</span>
+  all:
+    - field: process_name
+      op: in
+      value: [bash, sh]
+    - field: parent_process_name
+      op: in
+      value: [nginx, apache2]
+response:                       <span class="tk-com"># 必須。マッチ時に実行するアクションを指定します</span>
+  - alert
+mitre:                          <span class="tk-com"># 任意。MITRE ATT&amp;CK のテクニック ID です</span>
+  - T1059.004
+enabled: true                   <span class="tk-com"># 任意。既定値は true です</span></code></pre>
+
+<h3 id="schema-fields">フィールド詳細</h3>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>フィールド</th><th>型</th><th>必須</th><th>備考</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>id</code></td>
+  <td>string</td>
+  <td>◯</td>
+  <td>一意な ID です。<code>^R\d{3}$</code> 形式でない場合はロード時に拒否されます</td>
+</tr>
+<tr>
+  <td><code>title</code></td>
+  <td>string</td>
+  <td>◯</td>
+  <td>UI のアラート一覧などで表示されるサマリです</td>
+</tr>
+<tr>
+  <td><code>description</code></td>
+  <td>string</td>
+  <td>—</td>
+  <td>アラートの詳細画面で表示されます。複数行は <code>|</code> を用いて記述できます</td>
+</tr>
+<tr>
+  <td><code>severity</code></td>
+  <td>enum</td>
+  <td>◯</td>
+  <td>重要度です。<code>low</code> / <code>medium</code> / <code>high</code> / <code>critical</code> から選びます</td>
+</tr>
+<tr>
+  <td><code>event_type</code></td>
+  <td>enum</td>
+  <td>◯</td>
+  <td><code>process</code> / <code>file</code> / <code>network</code> / <code>auth</code>。Detector はこの種別に沿って評価を行います</td>
+</tr>
+<tr>
+  <td><code>condition</code></td>
+  <td>tree</td>
+  <td>◯</td>
+  <td>検知条件の評価木です。最大 10 段までの深度をサポートしています</td>
+</tr>
+<tr>
+  <td><code>response</code></td>
+  <td>list&lt;string&gt;</td>
+  <td>◯</td>
+  <td>マッチ時に実行されるアクションの名前です。<a href="responses.html">Responses</a> を参照してください</td>
+</tr>
+<tr>
+  <td><code>mitre</code></td>
+  <td>list&lt;string&gt;</td>
+  <td>—</td>
+  <td>MITRE ATT&amp;CK のテクニック ID です。UI で関連ページへのリンクが表示されます</td>
+</tr>
+<tr>
+  <td><code>enabled</code></td>
+  <td>bool</td>
+  <td>—</td>
+  <td><code>false</code> を設定すると、この Koguma は評価対象から除外されます</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="validation">ロード時のバリデーション</h2>
+
+<p>
+Koguma の読み込み処理は、<code>src/ursus/detector/rule_loader.py</code> の <code>load_rules()</code> が担当しています。
+読み込み中にエラーが検出された場合は、<strong>該当する 1 件のみをスキップ</strong>してログに記録し、他のルールのロードは継続して行われます。
+</p>
+
+<p>
+以下のケースでは Koguma が拒否されます：
+</p>
+
+<ul>
+  <li>YAML の構文エラーがある場合</li>
+  <li>必須フィールド（<code>id</code>, <code>title</code>, <code>severity</code>, <code>event_type</code>, <code>condition</code>, <code>response</code>）が欠けている場合</li>
+  <li><code>id</code> が <code>^R\d{3}$</code> の形式に一致しない場合</li>
+  <li><code>id</code> が他のルールと重複している場合</li>
+  <li><code>severity</code> または <code>event_type</code> が定義外の値である場合</li>
+  <li><code>response</code> が空リストである場合</li>
+  <li><code>condition</code> ツリーの深さが 10 段を超えている場合</li>
+  <li>リーフノードに <code>field</code> または <code>op</code> が存在しない場合</li>
+  <li><code>op</code> に未知の演算子が指定されている場合</li>
+</ul>
+
+<h2 id="condition">condition の記述方法</h2>
+
+<p>
+<code>condition</code> は再帰的な評価構造（ツリー）となっており、各ノードは「枝ノード」または「リーフノード」のいずれかとして定義されます。
+</p>
+
+<h3 id="branch">枝ノード</h3>
+
+<p>
+論理演算（AND, OR, NOT）を表現するノードです。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>キー</th><th>意味</th><th>子の形式</th><th>評価ロジック</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>all</code></td>
+  <td>AND</td>
+  <td>1つ以上のリスト</td>
+  <td>すべての子要素が「真」であれば「真」となります（短絡評価）。</td>
+</tr>
+<tr>
+  <td><code>any</code></td>
+  <td>OR</td>
+  <td>1つ以上のリスト</td>
+  <td>いずれかの子要素が「真」であれば「真」となります（短絡評価）。</td>
+</tr>
+<tr>
+  <td><code>not</code></td>
+  <td>NOT</td>
+  <td>単一ノード</td>
+  <td>子要素の評価結果を反転させます。</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<pre><code><span class="tk-com"># AND の例</span>
+condition:
+  all:
+    - field: process_name
+      op: eq
+      value: bash
+    - field: parent_process_name
+      op: eq
+      value: nginx
+
+<span class="tk-com"># OR + NOT のネスト</span>
+condition:
+  all:
+    - field: file_op
+      op: eq
+      value: modify
+    - any:
+      - field: file_path
+        op: startswith
+        value: /etc/cron.d/
+      - field: file_path
+        op: startswith
+        value: /etc/systemd/system/
+    - not:
+        field: process_name
+        op: eq
+        value: dpkg</code></pre>
+
+<h3 id="leaf">リーフノード</h3>
+
+<p>
+実際に値を比較する末端のノードです。
+</p>
+
+<pre><code>field: process_name             <span class="tk-com"># 必須。比較対象のフィールドを指定します</span>
+op: regex                       <span class="tk-com"># 必須。演算子を指定します</span>
+value: <span class="tk-str">"^/tmp/"</span>                  <span class="tk-com"># 指定した op に応じた値を記述します</span></code></pre>
+
+<h2 id="field">field の解決方法</h2>
+
+<p>
+<code>field</code> には以下の 2 種類の参照方法があります。
+</p>
+
+<h3 id="field-denorm">非正規化カラム名による参照</h3>
+
+<p>
+<code>events</code> テーブルの非正規化カラムを直接参照します。データベースのインデックスが利用されるため高速に動作し、ほとんどの Koguma はこの方法で記述できます。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>field</th><th>由来</th><th>主に使う event_type</th></tr></thead>
+<tbody>
+<tr><td><code>pid</code></td><td>プロセス ID</td><td>process / network / auth</td></tr>
+<tr><td><code>ppid</code></td><td>親プロセス ID</td><td>process</td></tr>
+<tr><td><code>user</code></td><td>実行ユーザー名</td><td>process</td></tr>
+<tr><td><code>process_name</code></td><td>プロセス名 (comm)</td><td>process / network</td></tr>
+<tr><td><code>parent_process_name</code></td><td>親プロセス名</td><td>process</td></tr>
+<tr><td><code>cmdline</code></td><td>コマンドライン (空白区切り 1 文字列)</td><td>process / auth (sudo)</td></tr>
+<tr><td><code>exe_path</code></td><td>実行ファイルの絶対パス</td><td>process</td></tr>
+<tr><td><code>file_path</code></td><td>変更対象のファイルパス</td><td>file</td></tr>
+<tr><td><code>file_op</code></td><td>create / modify / delete / move</td><td>file</td></tr>
+<tr><td><code>local_port</code></td><td>ローカル側ポート</td><td>network</td></tr>
+<tr><td><code>remote_addr</code></td><td>リモート IP</td><td>network</td></tr>
+<tr><td><code>remote_port</code></td><td>リモートポート</td><td>network</td></tr>
+<tr><td><code>conn_state</code></td><td>LISTEN / ESTABLISHED</td><td>network</td></tr>
+<tr><td><code>auth_user</code></td><td>認証対象ユーザー</td><td>auth</td></tr>
+<tr><td><code>auth_result</code></td><td>success / failure / sudo</td><td>auth</td></tr>
+<tr><td><code>source_ip</code></td><td>SSH 等の接続元 IP</td><td>auth</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="field-raw">raw_json へのドット記法アクセス</h3>
+
+<p>
+非正規化カラムに含まれていない情報は、<code>raw.&lt;key&gt;[.&lt;key&gt;...]</code> という形式で参照できます。
+ただし、評価のたびに <code>raw_json</code> をデコードするため、非正規化カラムを参照する場合に比べて処理速度は低下します。
+</p>
+
+<pre><code><span class="tk-com"># 例: process イベントの raw_json 内の cmdline 配列の最初の要素</span>
+condition:
+  - field: raw.cmdline.0
+    op: eq
+    value: bash
+
+<span class="tk-com"># 例: network イベントの raw.family</span>
+condition:
+  all:
+    - field: raw.family
+      op: eq
+      value: AF_INET6</code></pre>
+
+<p>
+指定したキーが存在しない場合は <code>None</code> として扱われ、ほとんどの演算子において「偽」と判定されます。
+</p>
+
+<h2 id="operators">演算子</h2>
+
+<p>
+すべての演算子は <code>(event_value, rule_value) -&gt; bool</code> という形式の純粋関数として、<code>src/ursus/detector/operators.py</code> に実装されています。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>op</th><th>真になる条件</th><th>value の型</th><th>None 時の挙動</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>eq</code></td>
+  <td><code>event == value</code></td>
+  <td>scalar</td>
+  <td>value が None の場合のみ真</td>
+</tr>
+<tr>
+  <td><code>neq</code></td>
+  <td><code>event != value</code></td>
+  <td>scalar</td>
+  <td>value が None でなければ真</td>
+</tr>
+<tr>
+  <td><code>in</code></td>
+  <td><code>event in value</code></td>
+  <td>list</td>
+  <td>list に None を含まなければ偽</td>
+</tr>
+<tr>
+  <td><code>not_in</code></td>
+  <td><code>event not in value</code></td>
+  <td>list</td>
+  <td>list に None を含まなければ真</td>
+</tr>
+<tr>
+  <td><code>regex</code></td>
+  <td><code>re.search(value, str(event))</code> がマッチ</td>
+  <td>string (正規表現)</td>
+  <td>常に偽</td>
+</tr>
+<tr>
+  <td><code>contains</code></td>
+  <td><code>value in str(event)</code></td>
+  <td>string</td>
+  <td>常に偽</td>
+</tr>
+<tr>
+  <td><code>startswith</code></td>
+  <td><code>str(event).startswith(value)</code></td>
+  <td>string</td>
+  <td>常に偽</td>
+</tr>
+<tr>
+  <td><code>endswith</code></td>
+  <td><code>str(event).endswith(value)</code></td>
+  <td>string</td>
+  <td>常に偽</td>
+</tr>
+<tr>
+  <td><code>gt</code></td>
+  <td><code>float(event) &gt; float(value)</code></td>
+  <td>number</td>
+  <td>変換失敗で偽</td>
+</tr>
+<tr>
+  <td><code>lt</code></td>
+  <td><code>float(event) &lt; float(value)</code></td>
+  <td>number</td>
+  <td>変換失敗で偽</td>
+</tr>
+<tr>
+  <td><code>exists</code></td>
+  <td><code>event is not None</code></td>
+  <td>(無視)</td>
+  <td>偽</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="regex-cache">regex のコンパイルキャッシュ</h3>
+
+<p>
+<code>regex</code> 演算子で使用されるパターンは、パフォーマンス向上のため <code>functools.lru_cache(maxsize=256)</code> を用いてキャッシュされます。
+これは、同じパターンが大量のイベントに対して繰り返し評価される運用を想定した最適化です。
+</p>
+
+<pre><code><span class="tk-com">@lru_cache(maxsize=256)</span>
+<span class="tk-kw">def</span> <span class="tk-fn">_compile</span>(pattern):
+    <span class="tk-kw">return</span> re.<span class="tk-fn">compile</span>(pattern)</code></pre>
+
+<h3 id="regex-tip">YAML 内の正規表現とエスケープ</h3>
+
+<p>
+YAML のダブルクォート（<code>"</code>）内では、バックスラッシュ（<code>\</code>）を 2 重（<code>\\</code>）に書く必要があります。
+シングルクォート（<code>'</code>）を使用すると、エスケープなしでそのまま記述できます。
+</p>
+
+<pre><code><span class="tk-com"># どちらも同じ正規表現 (curl|wget).+\|\s*(sh|bash) を表現</span>
+value: <span class="tk-str">"(curl|wget).+\\|\\s*(sh|bash)"</span>     <span class="tk-com"># ダブルクォート</span>
+value: <span class="tk-str">'(curl|wget).+\|\s*(sh|bash)'</span>       <span class="tk-com"># シングルクォート</span></code></pre>
+
+<h2 id="example-walkthrough">具体例：Koguma の評価フロー</h2>
+
+<p>
+R001（Web サーバー配下からのシェル起動）を例に、実際の評価プロセスを追ってみましょう。
+</p>
+
+<pre><code>id: R001
+event_type: process
+condition:
+  all:
+    - field: process_name
+      op: in
+      value: [bash, sh, dash, zsh, ash]
+    - field: parent_process_name
+      op: in
+      value: [nginx, apache2, httpd, php-fpm]</code></pre>
+
+<p>
+入力となるイベント（<code>events</code> テーブルの 1 レコード）の例：
+</p>
+
+<pre><code>event_type:          process
+process_name:        bash
+parent_process_name: nginx
+cmdline:             <span class="tk-str">"bash -c 'id'"</span>
+pid:                 <span class="tk-num">4567</span>
+ppid:                <span class="tk-num">1000</span>
+user:                www-data</code></pre>
+
+<p>
+評価プロセス：
+</p>
+
+<ol>
+  <li><code>event_type</code> が <code>process</code> なので、Detector はこのイベントを process 型の Koguma 群で評価します。</li>
+  <li>R001 の <code>condition.all</code> ノードを評価します。すべての子要素が「真」である必要があります。</li>
+  <li>子要素 1: <code>field=process_name</code> は <code>"bash"</code> です。<code>op=in</code> で <code>[bash, sh, dash, zsh, ash]</code> と比較し、「真」となります。</li>
+  <li>子要素 2: <code>field=parent_process_name</code> は <code>"nginx"</code> です。<code>op=in</code> で <code>[nginx, apache2, httpd, php-fpm]</code> と比較し、「真」となります。</li>
+  <li>すべての子要素が真であるため、<code>all</code> の評価結果は「真」となり、R001 が発火します。</li>
+  <li><code>response</code> に指定された <code>alert</code> アクションが実行され、<code>alerts</code> テーブルにレコードが追加されます。</li>
+</ol>
+
+<h2 id="examples">イベント種別ごとの Koguma の例</h2>
+
+<h3 id="ex-process">process</h3>
+
+<pre><code><span class="tk-com"># R009: SUID ビット付与</span>
+id: R009
+event_type: process
+condition:
+  all:
+    - field: process_name
+      op: eq
+      value: chmod
+    - field: cmdline
+      op: regex
+      value: <span class="tk-str">"(u\\+s|\\b4[0-7]{3}\\b)"</span>
+response:
+  - alert
+mitre:
+  - T1548.001</code></pre>
+
+<h3 id="ex-file">file</h3>
+
+<pre><code><span class="tk-com"># /etc/passwd / /etc/shadow への変更を検知</span>
+id: R002
+event_type: file
+condition:
+  all:
+    - field: file_op
+      op: in
+      value: [create, modify]
+    - field: file_path
+      op: in
+      value: [<span class="tk-str">"/etc/passwd"</span>, <span class="tk-str">"/etc/shadow"</span>]
+response:
+  - alert</code></pre>
+
+<h3 id="ex-network">network</h3>
+
+<pre><code><span class="tk-com"># 高ポートでの新規 LISTEN を検知</span>
+id: Rxxx
+event_type: network
+condition:
+  all:
+    - field: conn_state
+      op: eq
+      value: LISTEN
+    - field: local_port
+      op: gt
+      value: <span class="tk-num">10000</span>
+response:
+  - alert</code></pre>
+
+<h3 id="ex-auth">auth</h3>
+
+<pre><code><span class="tk-com"># R011: SSH での root ユーザログイン試行</span>
+id: R011
+event_type: auth
+condition:
+  all:
+    - field: auth_user
+      op: eq
+      value: root
+    - field: source_ip
+      op: exists
+response:
+  - alert
+mitre:
+  - T1110</code></pre>
+
+<h2 id="bundled">同梱されているデフォルトルールの一覧</h2>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>ID</th><th>タイトル</th><th>event_type</th><th>severity</th><th>MITRE</th></tr></thead>
+<tbody>
+<tr><td><code>R001</code></td><td>Webサーバー配下からのシェル起動</td><td>process</td><td>high</td><td>T1059.004</td></tr>
+<tr><td><code>R002</code></td><td>スクリプト言語によるインタラクティブシェルの起動 (pty.spawn)</td><td>process</td><td>high</td><td>T1059.006</td></tr>
+<tr><td><code>R003</code></td><td>Netcatによるリバースシェル/バインドシェルの実行</td><td>process</td><td>high</td><td>T1059</td></tr>
+<tr><td><code>R004</code></td><td>/tmp 配下からのバイナリ実行</td><td>process</td><td>medium</td><td>—</td></tr>
+<tr><td><code>R005</code></td><td>機密ファイルの変更 (/etc/shadow 等)</td><td>file</td><td>high</td><td>T1003.008</td></tr>
+<tr><td><code>R006</code></td><td>SSH公開鍵の不正追加・変更</td><td>file</td><td>high</td><td>T1098.004</td></tr>
+<tr><td><code>R007</code></td><td>/var/tmp 配下への不審なバイナリ・ツールのコピー</td><td>file</td><td>high</td><td>T1105</td></tr>
+<tr><td><code>R008</code></td><td>不審なポートへの外部通信 (C2通信の疑い)</td><td>network</td><td>high</td><td>T1043</td></tr>
+<tr><td><code>R009</code></td><td>SSH での root ユーザログイン試行</td><td>auth</td><td>high</td><td>T1110, T1078.003</td></tr>
+<tr><td><code>R010</code></td><td>sudo 経由での悪意あるコマンド実行</td><td>auth</td><td>medium</td><td>T1548.003, T1136.001</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="dedup">重複発火の抑止について</h2>
+
+<p>
+Detector は、<code>(rule_id, triggered_event_id)</code> の組み合わせに基づいて、すでに <code>alerts</code> テーブルに該当するレコードが存在するかを <code>_fire_alert</code> 処理の中で事前にチェックします。これにより、バックフィル処理や再起動後のチェックポイントからの再評価などで同一イベントを再度処理した場合でも、重複してアラートが生成されることはありません。
+</p>
+
+<pre><code>existing = conn.<span class="tk-fn">execute</span>(
+    <span class="tk-str">"SELECT id FROM alerts WHERE rule_id = ? AND triggered_event_id = ?"</span>,
+    (rule.id, ev[<span class="tk-str">"id"</span>]),
+).<span class="tk-fn">fetchone</span>()
+<span class="tk-kw">if</span> existing:
+    <span class="tk-kw">return</span></code></pre>
+
+<h2 id="pitfalls">よくある間違いと注意点</h2>
+
+<h3 id="pitfall-not"><code>not</code> の子要素はリストではありません</h3>
+
+<p>
+<code>all</code> や <code>any</code> は子要素としてリストを受け取りますが、<code>not</code> は単一のノードのみを受け取ります。
+</p>
+
+<pre><code><span class="tk-com"># 誤り: not の値がリスト</span>
+condition:
+  not:
+    - field: process_name
+      op: eq
+      value: bash
+
+<span class="tk-com"># 正しい: not の値は単一ノード</span>
+condition:
+  not:
+    field: process_name
+    op: eq
+    value: bash</code></pre>
+
+<h3 id="pitfall-event-type">event_type の指定ミス</h3>
+
+<p>
+Detector は <code>event_type</code> が一致する Koguma のみを評価対象とします。
+例えば、認証失敗に関する検知条件を <code>event_type: process</code> として記述しても、評価対象から外れるため検知は行われません。
+</p>
+
+<h3 id="pitfall-cmdline">cmdline は空白区切りの単一文字列です</h3>
+
+<p>
+<code>process</code> イベントにおける非正規化カラムの <code>cmdline</code> は、コマンドライン引数を空白で連結した 1 つの文字列です。
+引数を個別の要素として扱いたい場合は、ドット記法を用いて <code>raw.cmdline</code> を参照してください。
+</p>
+
+<h3 id="pitfall-network-cmdline">network イベントには cmdline は含まれません</h3>
+
+<p>
+<code>network</code> イベントの非正規化カラムには <code>process_name</code> は存在しますが、<code>cmdline</code> は含まれていません。
+プロセス名に基づいてフィルタリングを行う場合は、<code>process_name</code> フィールドを使用してください。
+</p>
+
+<h2 id="next">関連ドキュメント</h2>
+
+<ul>
+  <li><a href="pipeline.html">Detector の仕組み</a> — チェックポイント駆動の評価ループについて解説します</li>
+  <li><a href="responses.html">レスポンス動作</a> — マッチ時に実行されるアクションの仕様について解説します</li>
+</ul>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+</article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

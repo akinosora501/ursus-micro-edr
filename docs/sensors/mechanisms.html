@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sensor の仕組み · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+      class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="../index.html"
+        class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="../assets/ursus_logo.png" alt="URSUS" class="h-8 w-auto">
+        <span
+          class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../index.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">URSUSとは</a></li>
+            <li><a href="../quickstart.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">インストールと実行</a>
+            </li>
+            <li><a href="../architecture.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">アーキテクチャ</a>
+            </li>
+            <li><a href="../disclaimer.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">免責事項</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="mechanisms.html"
+                class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">Sensor の仕組み</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../detector/pipeline.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Detector の仕組み</a>
+            </li>
+            <li><a href="../detector/rules.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Koguma ルールの定義</a></li>
+            <li><a href="../detector/responses.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">レスポンス動作</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../operations.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">設定の変更</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">
+        URSUS · MIT License
+      </div>
+    </aside>
+
+    <!-- ── Content area ─────────────────────────────────────────── -->
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <!-- Mobile header -->
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()"
+          class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label="メニューを開く">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <a href="../index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="../assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+            <header class="mb-12">
+              <h1>Sensor の仕組み</h1>
+              <p class="subtitle">URSUS が Linux システムからイベントを収集する技術的アプローチの詳細</p>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+                <a href="#process" class="card">
+                  <h3>Process Collector</h3>
+                  <p>netlink によるリアルタイム起動監視</p>
+                </a>
+                <a href="#file" class="card">
+                  <h3>File Collector</h3>
+                  <p>inotify によるファイル変更検知</p>
+                </a>
+                <a href="#network" class="card">
+                  <h3>Network Collector</h3>
+                  <p>TCP 接続テーブルの差分抽出</p>
+                </a>
+                <a href="#auth" class="card">
+                  <h3>Auth Collector</h3>
+                  <p>journalctl 経由の認証ログ購読</p>
+                </a>
+              </div>
+            </header>
+
+            <hr class="my-12 border-slate-200">
+
+            <!-- Process Collector Section -->
+            <section id="process" class="scroll-mt-12">
+              <h1><span class="tag-pill process">process</span> Process Collector</h1>
+              <p class="subtitle">netlink (cn_proc) でプロセス起動をカーネルから push 通知で受け取る</p>
+
+              <h2 id="process-goal">目的</h2>
+              <p>
+              URSUS が観測する <strong>4 つのイベントタイプの中で最も重要</strong>なのが
+              プロセス起動です。攻撃者の行動はほぼ必ず「何かのプロセスを起動する」という
+              形で表面化します。シェル、payload バイナリ、永続化のための cron タスク、
+              横展開の psexec — 全てプロセス起動として観測できます。
+              </p>
+
+              <h2 id="process-approach">採用方式: cn_proc netlink</h2>
+              <p>
+              プロセス起動を観測する Linux 上の選択肢は複数あります。URSUS は
+              <strong>kernel から直接 push 通知を受ける</strong>方式を採用しています。
+              </p>
+
+              <div class="tbl-wrap">
+              <table>
+              <thead>
+              <tr><th>方式</th><th>取りこぼし</th><th>必要権限</th><th>備考</th></tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td><strong>cn_proc netlink (採用)</strong></td>
+                <td>なし</td>
+                <td>CAP_NET_ADMIN</td>
+                <td>カーネルが exec(2) のたびに通知。リアルタイム</td>
+              </tr>
+              <tr>
+                <td>psutil ポーリング</td>
+                <td>あり (poll 間隔より短命)</td>
+                <td>不要</td>
+                <td>DESIGN.md の初版方針。実装簡単だが取りこぼし大</td>
+              </tr>
+              <tr>
+                <td>auditd</td>
+                <td>なし</td>
+                <td>root</td>
+                <td>execve syscall を audit ルールで購読。出力フォーマットが煩雑</td>
+              </tr>
+              <tr>
+                <td>eBPF (kprobe)</td>
+                <td>なし</td>
+                <td>CAP_BPF</td>
+                <td>商用 EDR の主流実装。bcc / libbpf-CO-RE への依存が必要</td>
+              </tr>
+              </tbody>
+              </table>
+              </div>
+
+              <h2 id="cn-proc">cn_proc とは</h2>
+              <p>
+              <strong>cn_proc</strong> (process events connector) は、Linux カーネルが
+              <a href="https://docs.kernel.org/driver-api/connector.html" target="_blank" rel="noopener">connector</a>
+              インタフェースを介して送出するマルチキャストイベントです。netlink ソケットの
+              <code>NETLINK_CONNECTOR</code> プロトコルファミリーで購読します。
+              </p>
+
+              <p>
+              カーネルは以下のイベントを通知します:
+              </p>
+
+              <ul>
+                <li><code>PROC_EVENT_FORK</code>: fork(2) 完了時</li>
+                <li><code>PROC_EVENT_EXEC</code>: execve(2) 成功時</li>
+                <li><code>PROC_EVENT_EXIT</code>: プロセス終了時</li>
+                <li><code>PROC_EVENT_UID</code>, <code>PROC_EVENT_GID</code>: 権限変更時</li>
+                <li>その他 (sid, ptrace 等)</li>
+              </ul>
+
+              <p>
+              URSUS は <strong>EXEC のみを購読</strong>しています。検知に必要な情報
+              （プロセス名・コマンドライン・実行ファイル・親プロセス）は exec の
+              タイミングで揃うためです。
+              </p>
+
+              <div class="diagram">
+              <pre>
+  bytes 0  ─┐
+            │  ┌──────────────────────────────┐
+   nlmsghdr │  │ len, type, flags, seq, pid   │  16 bytes
+            │  └──────────────────────────────┘
+  bytes 16 ─┤
+            │  ┌──────────────────────────────┐
+   cn_msg   │  │ idx, val, seq, ack, len, fl  │  20 bytes
+            │  └──────────────────────────────┘
+  bytes 36 ─┤
+            │  ┌──────────────────────────────┐
+   evt_hdr  │  │ what, cpu, timestamp_ns      │  16 bytes
+            │  └──────────────────────────────┘
+  bytes 52 ─┤
+            │  ┌──────────────────────────────┐
+  body (exec)│ │ pid, tgid                    │  8 bytes
+            │  └──────────────────────────────┘
+  bytes 60 ─┘
+              </pre>
+              <p class="diagram-caption">PROC_EVENT_EXEC を含む netlink メッセージのレイアウト</p>
+              </div>
+
+              <h2 id="process-output">出力されるイベント</h2>
+              <h3>非正規化カラム</h3>
+              <div class="tbl-wrap">
+              <table>
+              <thead><tr><th>カラム</th><th>値の例</th><th>用途</th></tr></thead>
+              <tbody>
+              <tr><td><code>pid</code></td><td><code>4567</code></td><td>同 PID で前後コンテキストを引く</td></tr>
+              <tr><td><code>ppid</code></td><td><code>1000</code></td><td>プロセスツリー再構築</td></tr>
+              <tr><td><code>user</code></td><td><code>www-data</code></td><td>権限昇格検知</td></tr>
+              <tr><td><code>process_name</code></td><td><code>bash</code></td><td>R001 (web→shell) 等で照合</td></tr>
+              <tr><td><code>parent_process_name</code></td><td><code>nginx</code></td><td>親プロセス基準のルール</td></tr>
+              <tr><td><code>cmdline</code></td><td><code>bash -c curl ... | sh</code></td><td>regex 検知</td></tr>
+              <tr><td><code>exe_path</code></td><td><code>/usr/bin/bash</code></td><td>/tmp 配下からの実行検知 (R010)</td></tr>
+              </tbody>
+              </table>
+              </div>
+
+              <h2 id="process-limits">制限と既知の挙動</h2>
+              <ul>
+                <li><strong>fork のみのイベントは取れない</strong>: EXEC を購読しているため。</li>
+                <li><strong>extreme short-lived プロセス</strong>: netlink 通知後、/proc 情報を読み取る前に終了したプロセスは詳細が取れない。</li>
+                <li><strong>権限</strong>: <code>CAP_NET_ADMIN</code> が必要。</li>
+              </ul>
+            </section>
+
+            <hr class="my-20 border-slate-200">
+
+            <!-- File Collector Section -->
+            <section id="file" class="scroll-mt-12">
+              <h1><span class="tag-pill file">file</span> File Collector</h1>
+              <p class="subtitle">inotify (watchdog) によるファイル変更のリアルタイム検知</p>
+
+              <h2 id="file-goal">目的</h2>
+              <p>
+              攻撃者の永続化やデータ改竄は、最終的に「ファイル書き込み」として表面化します。
+              <code>/etc/passwd</code> の書き込み、SSH 鍵の改変、cron タスクの投入などを監視します。
+              </p>
+
+              <h2 id="file-approach">採用方式: inotify (watchdog 経由)</h2>
+              <div class="tbl-wrap">
+              <table>
+              <thead><tr><th>方式</th><th>PID/Process 取得</th><th>必要権限</th><th>備考</th></tr></thead>
+              <tbody>
+              <tr>
+                <td><strong>inotify (採用)</strong></td>
+                <td>✗</td>
+                <td>不要</td>
+                <td>カーネルの fs 通知。watchdog ライブラリで Python から扱う</td>
+              </tr>
+              <tr>
+                <td>fanotify</td>
+                <td>◎ (PID/exe path)</td>
+                <td>CAP_SYS_ADMIN</td>
+                <td>5.1+ で <code>FAN_REPORT_FID</code></td>
+              </tr>
+              <tr>
+                <td>auditd file watch</td>
+                <td>◎</td>
+                <td>root</td>
+                <td><code>auditctl -w /etc/passwd -p wa</code></td>
+              </tr>
+              </tbody>
+              </table>
+              </div>
+
+              <div class="warn">
+              <strong>inotify は "誰が変更したか" を返さない</strong>
+              <p>
+              URSUS の現在の実装では、ファイルが改変されたことは分かりますが
+              「どのプロセスが書き込んだか」は分かりません。
+              </p>
+              </div>
+
+              <h2 id="file-exclusion">除外パターンと自己フィードバック防止</h2>
+              <p>
+              URSUS 自体の DB 更新による無限ループを防ぐため、DB ディレクトリは無条件で除外されます。
+              また、glob パターンによる除外設定も可能です。
+              </p>
+
+              <h2 id="file-output">出力されるイベント</h2>
+              <h3>非正規化カラム</h3>
+              <div class="tbl-wrap">
+              <table>
+              <thead><tr><th>カラム</th><th>例</th></tr></thead>
+              <tbody>
+              <tr><td><code>file_path</code></td><td><code>/etc/passwd</code></td></tr>
+              <tr><td><code>file_op</code></td><td><code>create</code> / <code>modify</code> / <code>delete</code> / <code>move</code></td></tr>
+              </tbody>
+              </table>
+              </div>
+            </section>
+
+            <hr class="my-20 border-slate-200">
+
+            <!-- Network Collector Section -->
+            <section id="network" class="scroll-mt-12">
+              <h1><span class="tag-pill network">network</span> Network Collector</h1>
+              <p class="subtitle">psutil による TCP 接続テーブル差分ポーリング</p>
+
+              <h2 id="network-goal">目的</h2>
+              <p>
+              新規 LISTEN（リバースシェル待ち受け）や新規 ESTABLISHED（C2 通信、データ送信）を観測します。
+              </p>
+
+              <h2 id="network-approach">採用方式: psutil 差分ポーリング</h2>
+              <p>
+              network センサはポーリング方式です。2 秒間隔（既定）で <code>/proc/net/tcp</code> を読み取り、前回のスナップショットとの差分を抽出します。
+              </p>
+
+              <div class="warn">
+              <strong>取りこぼしを許容している</strong>
+              <p>
+              ポーリング間隔より短命な接続（1秒以内に閉じる curl など）は見えないことがあります。
+              </p>
+              </div>
+
+              <h2 id="network-output">出力されるイベント</h2>
+              <h3>非正規化カラム</h3>
+              <div class="tbl-wrap">
+              <table>
+              <thead><tr><th>カラム</th><th>例 (ESTABLISHED)</th><th>例 (LISTEN)</th></tr></thead>
+              <tbody>
+              <tr><td><code>pid</code></td><td><code>4567</code></td><td><code>999</code></td></tr>
+              <tr><td><code>process_name</code></td><td><code>python3</code></td><td><code>sshd</code></td></tr>
+              <tr><td><code>local_port</code></td><td><code>54321</code></td><td><code>22</code></td></tr>
+              <tr><td><code>remote_addr</code></td><td><code>192.0.2.10</code></td><td><code>NULL</code></td></tr>
+              <tr><td><code>conn_state</code></td><td><code>ESTABLISHED</code></td><td><code>LISTEN</code></td></tr>
+              </tbody>
+              </table>
+              </div>
+            </section>
+
+            <hr class="my-20 border-slate-200">
+
+            <!-- Auth Collector Section -->
+            <section id="auth" class="scroll-mt-12">
+              <h1><span class="tag-pill auth">auth</span> Auth Collector</h1>
+              <p class="subtitle">systemd-journald を journalctl 経由で購読し SSH/sudo を観測</p>
+
+              <h2 id="auth-goal">目的</h2>
+              <p>
+              SSH ブルートフォース、初期アクセス確立、<code>sudo</code> による権限昇格を観測します。
+              </p>
+
+              <h2 id="auth-approach">採用方式: journalctl 購読</h2>
+              <p>
+              <code>journalctl -f --output=json</code> を子プロセスとして起動し、新規ログをリアルタイムに受け取ります。
+              </p>
+
+              <div class="diagram">
+              <pre>
+   journalctl -f --output=json     ─────  カーネル
+   ────────────────────────────              │
+        │                                    │ inotify / signalfd
+        ▼
+   stdout (1行 1JSON)
+        │
+        ▼
+   Python: select.poll()  ─────── stop_event チェック
+        │
+        ▼
+   _handle_line(line): JSON 解析 → 正規表現で分類
+              </pre>
+              </div>
+
+              <h2 id="auth-output">出力されるイベント</h2>
+              <h3>非正規化カラム</h3>
+              <div class="tbl-wrap">
+              <table>
+              <thead><tr><th>カラム</th><th>値の例</th></tr></thead>
+              <tbody>
+              <tr><td><code>auth_user</code></td><td><code>root</code></td></tr>
+              <tr><td><code>auth_result</code></td><td><code>success</code> / <code>failure</code> / <code>sudo</code></td></tr>
+              <tr><td><code>source_ip</code></td><td><code>203.0.113.5</code></td></tr>
+              <tr><td><code>process_name</code></td><td><code>sshd</code></td></tr>
+              <tr><td><code>cmdline</code></td><td>(sudo の場合) <code>/usr/bin/cat /etc/shadow</code></td></tr>
+              </tbody>
+              </table>
+              </div>
+            </section>
+
+            <footer class="docs-footer">
+              <span>URSUS Micro EDR · MIT License</span>
+              <span>
+                <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+              </span>
+            </footer>
+          </article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quick Start · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()"
+       class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <aside id="sidebar"
+      class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="index.html"
+        class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="assets/ursus_logo.png" alt="URSUS" class="h-8 w-auto">
+        <span
+          class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="index.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">URSUSとは</a></li>
+            <li><a href="quickstart.html"
+                class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">インストールと実行</a>
+            </li>
+            <li><a href="architecture.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">アーキテクチャ</a>
+            </li>
+            <li><a href="disclaimer.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">免責事項</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="sensors/mechanisms.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Sensor の仕組み</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="detector/pipeline.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Detector の仕組み</a>
+            </li>
+            <li><a href="detector/rules.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Koguma ルールの定義</a></li>
+            <li><a href="detector/responses.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">レスポンス動作</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="operations.html"
+                class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">設定の変更</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">
+        URSUS · MIT License
+      </div>
+    </aside>
+
+    <!-- ── Content area ─────────────────────────────────────────── -->
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <!-- Mobile header -->
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()"
+          class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700" aria-label="メニューを開く">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <a href="index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1>インストールと実行</h1>
+<p class="subtitle">5 分で URSUS を起動し、最初のアラートを観測する</p>
+
+<div class="warn">
+<strong>仮想マシン上での実行を推奨します</strong>
+<p>
+URSUS の sensor は <code>netlink</code> ソケットへのバインドや <code>/proc</code> 経由の
+プロセス情報読み取りで <strong>root 権限</strong>を要求します。学習用途として
+お使いのホスト OS には影響を出したくないので、Parrot OS / Kali / Ubuntu 等の
+仮想マシンを用意してそこで実行するのがおすすめです。
+</p>
+</div>
+
+<h2 id="environment">動作環境</h2>
+
+<h3>システム要件</h3>
+<ul>
+  <li><strong>OS:</strong> Linux (x86_64 / arm64) ※サービスの常駐に systemd を使用します</li>
+  <li><strong>Kernel:</strong> 3.10 以上（プロセス監視用の <code>cn_proc</code> netlink サポート必須）</li>
+  <li><strong>Python:</strong> 3.11 以上</li>
+  <li><strong>依存ツール:</strong> <code>curl</code>, <code>python3-venv</code> などの基本パッケージ</li>
+  <li><strong>実行権限:</strong> root 権限（<code>sudo</code> 実行可能であること）</li>
+</ul>
+
+<h3>推奨スペック</h3>
+<p>
+  厳密な要求性能は未検証ですが、検証用の軽量仮想マシン（VM）でも十分に動作します。
+</p>
+
+
+<h2 id="install">1. インストール</h2>
+<pre><code><span class="tk-com"># リポジトリ取得</span>
+$ git clone https://github.com/&lt;user&gt;/ursus.git
+$ cd ursus
+
+<span class="tk-com"># 実行権限の付与</span>
+$ chmod +x scripts/*.sh
+
+<span class="tk-com"># インストーラの実行</span>
+$ <span class="tk-kw">sudo</span> ./scripts/install.sh</code></pre>
+<p>
+インストーラは <code>/opt/ursus</code> にソースをコピーし、システムユーザーの作成、
+仮想環境の構築、および systemd ユニットの登録を自動で行います。
+</p>
+
+<h2 id="run">2. サービスの起動</h2>
+<pre><code><span class="tk-com"># サービスの開始</span>
+$ <span class="tk-kw">sudo</span> /opt/ursus/scripts/start.sh
+
+<span class="tk-com"># 自動起動の有効化</span>
+$ <span class="tk-kw">sudo</span> systemctl enable ursus-sensor ursus-detector ursus-ui
+
+<span class="tk-com"># ログの確認 (リアルタイム表示)</span>
+$ journalctl -u ursus-sensor -u ursus-detector -u ursus-ui -f</code></pre>
+
+<p>
+<code>start.sh</code> を実行すると、sensor, detector, ui の 3 つのサービスが
+systemd 配下でバックグラウンド起動します。
+起動後にブラウザで <a href="http://127.0.0.1:8080/" target="_blank" rel="noopener">http://127.0.0.1:8080/</a>
+にアクセスするとダッシュボードが表示されます。
+</p>
+
+<div class="tip">
+<strong>標準の systemctl コマンドも使用可能です</strong>
+<p>
+スクリプトを使わずに、標準のコマンドで個別に操作することもできます:<br>
+<code>sudo systemctl start ursus-sensor ursus-detector ursus-ui</code>
+</p>
+</div>
+
+<div class="info">
+<strong>ログの読み方</strong>
+<p>
+ログは JSON 形式で出力されます。sensor が起動し、各コレクタ（process, file, network, auth）
+が "started" を出力していることを確認してください。
+</p>
+</div>
+
+<h2 id="config">3. config.yml の確認</h2>
+<p>
+インストール先の <code>/opt/ursus/config.yml</code> がシステムの設定ファイルになります。
+学習用途ではデフォルトのままで動作するように構成されています。
+</p>
+<pre><code><span class="tk-com">database:</span>
+  path: ./data/edr.db          <span class="tk-com"># SQLite ファイルパス</span>
+  retention_days: 3            <span class="tk-com"># 古いイベントの自動削除日数</span>
+
+<span class="tk-com">sensor:</span>
+  hostname: auto
+  process: { enabled: true }
+  file:
+    enabled: true
+    watch_paths: [/etc, /tmp, /var/tmp, /home]
+    exclude_patterns: [<span class="tk-str">"*.swp"</span>, <span class="tk-str">"*~"</span>, <span class="tk-str">"*/.cache/*"</span>]
+    modify_debounce_sec: 2.0
+  network:
+    enabled: true
+    poll_interval_sec: 2.0
+    established_debounce_sec: 5.0
+  auth:
+    enabled: true
+    journal_units: [ssh.service, sshd.service]
+    journal_comms: [sudo]
+
+<span class="tk-com">detector:</span>
+  enabled: true
+  poll_interval_sec: 1.0
+  rules_dir: ./rules
+  response:
+    dry_run: true              <span class="tk-com"># 既定で全レスポンス dry-run</span>
+    allowed_actions: [alert]
+
+<span class="tk-com">ui:</span>
+  bind_host: 127.0.0.1         <span class="tk-com"># ループバック固定（外部公開禁止）</span>
+  bind_port: 8080</code></pre>
+
+<h2 id="stop">4. サービスの停止</h2>
+<p>一時的に監視を停止したい場合は、<code>stop.sh</code> を使用します。</p>
+<pre><code><span class="tk-com"># サービスの一時停止</span>
+$ <span class="tk-kw">sudo</span> /opt/ursus/scripts/stop.sh</code></pre>
+
+<h2 id="uninstall">5. アンインストール</h2>
+<p>URSUS をシステムから削除するには、<code>uninstall.sh</code> を使用します。</p>
+<pre><code><span class="tk-com"># アンインストール (コードのみ削除。データは保持)</span>
+$ <span class="tk-kw">sudo</span> /opt/ursus/scripts/uninstall.sh
+
+<span class="tk-com"># 完全削除 (データや DB、ursus ユーザーも含めて全削除)</span>
+$ <span class="tk-kw">sudo</span> /opt/ursus/scripts/uninstall.sh --purge</code></pre>
+
+<div class="warn">
+<strong>アンインストール後の注意</strong>
+<p>
+<code>uninstall.sh</code> でサービス定義だけを削除した場合、
+<code>data/</code> ディレクトリと SQLite DB はそのまま残ります。
+次回 <code>install.sh</code> を実行したときは、既存の DB に上書きされるため
+検知ルールやアラート履歴は維持されます。
+</p>
+<p>
+完全に初期状態に戻したい場合は、手動で <code>data/</code>
+を削除するか、<code>uninstall.sh --purge</code> を実行してください。
+</p>
+</div>
+
+<h2 id="trigger-alert">6. 最初のアラートを発火させる</h2>
+<p>
+URSUS には <code>rules/</code> 配下に予めデフォルトルールセットが用意されています。
+そのうち <strong>R010</strong>（sudo 経由での悪意あるコマンド実行）を試してみます。
+</p>
+<pre><code><span class="tk-com"># ターミナルで以下を実行</span>
+$ sudo chmod u+s /bin/bash</code></pre>
+<p>
+数秒後、UI の <code>/alerts</code> ページに <strong>R010 — sudo 経由での悪意あるコマンド実行</strong>
+のアラートが表示されているはずです。アラート行をクリックすると詳細画面に飛び、
+発火したコマンドラインや前後のプロセスコンテキストが見られます。
+</p>
+
+<div class="ok">
+<strong>これで何が起きたか</strong>
+<ol>
+  <li>bash プロセスが起動 → <code>cn_proc</code> netlink がカーネルから sensor に届く</li>
+  <li>sensor が <code>events</code> 表に <code>process_name=bash, cmdline="..."</code> を INSERT</li>
+  <li>detector が次のポーリングで新しい event を SELECT</li>
+  <li>R004 ルールの condition (<code>cmdline regex "(curl|wget).+\\|\\s*(sh|bash)"</code>) にマッチ</li>
+  <li><code>alerts</code> 表に INSERT、<code>response_log</code> に "alert" 動作を dry_run で記録</li>
+  <li>UI がブラウザに表示</li>
+</ol>
+</div>
+
+
+<h2 id="next">次のステップ</h2>
+<ul>
+  <li><a href="architecture.html">Architecture</a> — 3 プロセスがどう連携しているか</li>
+  <li><a href="sensors/mechanisms.html">センサーの仕組み</a> — 各コレクタの技術詳細とコード</li>
+  <li><a href="detector/rules.html">Rules DSL</a> — 自分でルールを書く</li>
+  <li><a href="operations.html">Operations</a> — systemd で常駐させる</li>
+</ul>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+
+          </article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

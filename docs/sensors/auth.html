@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Auth Collector · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="../index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="../assets/ursus_logo.png" alt="URSUS" class="h-7 w-auto">
+        <span class="text-white font-bold text-sm tracking-wide">URSUS</span>
+        <span class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../index.html"        class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Introduction</a></li>
+            <li><a href="../quickstart.html"   class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Quick Start</a></li>
+            <li><a href="../architecture.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Architecture</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="process.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Process Collector</a></li>
+            <li><a href="file.html"    class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">File Collector</a></li>
+            <li><a href="network.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Network Collector</a></li>
+            <li><a href="auth.html" class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">Auth Collector</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../detector/pipeline.html"  class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Pipeline</a></li>
+            <li><a href="../detector/rules.html"     class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Rules DSL</a></li>
+            <li><a href="../detector/responses.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Responses</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../operations.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Operations</a></li>
+            <li><a href="../glossary.html"   class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Glossary</a></li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">URSUS · MIT License</div>
+    </aside>
+
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100" aria-label="メニュー">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a href="../index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="../assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1><span class="tag-pill auth">auth</span> Auth Collector</h1>
+<p class="subtitle">systemd-journald を journalctl 経由で購読し SSH/sudo を観測</p>
+
+<h2 id="goal">目的</h2>
+
+<p>
+認証イベントは EDR の中でも特に重要です。攻撃者の足跡として:
+</p>
+
+<ul>
+  <li><strong>SSH ブルートフォース</strong>: 短時間に大量の <code>Failed password</code></li>
+  <li><strong>初期アクセス確立</strong>: <code>Accepted password</code> を観測</li>
+  <li><strong>権限昇格</strong>: <code>sudo</code> による特権コマンド実行</li>
+  <li><strong>不審なログイン</strong>: 通常使わないアカウントや時刻のログイン</li>
+</ul>
+
+<h2 id="approach">採用方式: journalctl 購読</h2>
+
+<p>
+DESIGN.md の初版では <code>/var/log/auth.log</code> を tail する想定でしたが、最近の
+ディストリ（Arch, Fedora, Parrot OS 等）では auth.log を持たず、
+<strong>systemd-journald</strong> に統合されています。URSUS は <code>journalctl -f --output=json</code>
+を子プロセスとして起動し、その stdout から JSON を 1 行ずつ受け取ります。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>方式</th><th>環境依存</th><th>追加依存</th><th>備考</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>journalctl 購読 (採用)</strong></td>
+  <td>systemd 必須</td>
+  <td>なし（journalctl は同梱）</td>
+  <td>auth.log が無くても動く</td>
+</tr>
+<tr>
+  <td>auth.log tail</td>
+  <td>rsyslog 必要</td>
+  <td>なし</td>
+  <td>古い実装。最近のディストリで動かない</td>
+</tr>
+<tr>
+  <td>libsystemd の python binding</td>
+  <td>systemd 必須</td>
+  <td><code>python-systemd</code></td>
+  <td>API クリーンだが C 拡張のビルドが必要</td>
+</tr>
+<tr>
+  <td>NETLINK_AUDIT</td>
+  <td>auditd 必要</td>
+  <td>なし</td>
+  <td>システム auditd と排他</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="why-subprocess">なぜ subprocess + select?</h2>
+
+<p>
+<code>journalctl -f</code> は内部で <code>sd_journal_wait()</code> を呼び、
+カーネルの inotify / signalfd 通知で叩き起こされる形で寝ています。
+これにより新規ログが書かれた瞬間に stdout に流せる効率実装になっています。
+</p>
+
+<p>
+URSUS から見ると:
+</p>
+
+<ul>
+  <li>journalctl 自体は寝ていて CPU を使わない</li>
+  <li>新規行は数 ms 以内に届く（取りこぼし・遅延ともなし）</li>
+  <li>Python 側は <code>select.poll()</code> で stdout fd を待ち、500ms ごとに stop_event を確認する</li>
+</ul>
+
+<div class="diagram">
+<pre>
+   journalctl -f --output=json     ─────  カーネル
+   ────────────────────────────              │
+        │                                    │ inotify on /var/log/journal/
+        │  sd_journal_wait()                 │ + signalfd
+        │      │                             │
+        │      └────── 寝る ─────── 起こされる ◀┘
+        ▼
+   stdout (1行 1JSON)
+        │
+        ▼
+   Python: select.poll(0.5s)  ─────── stop_event チェック
+        │
+        ▼
+   _handle_line(line): JSON.loads → MESSAGE 抽出 → 正規表現で分類
+        │
+        ▼
+   events 表に INSERT
+</pre>
+</div>
+
+<h2 id="filtering">journalctl の match 構文で絞り込む</h2>
+
+<p>
+journalctl は <code>FIELD=VALUE</code> 形式で match を指定すると kernel 側で
+フィルタリングしてくれます。URSUS は config の <code>journal_units</code> /
+<code>journal_comms</code> から自動生成します。
+</p>
+
+<pre><code><span class="tk-com"># 起動するコマンド (実際には stdbuf + journalctl)</span>
+journalctl -f --output=json --no-pager \
+    _SYSTEMD_UNIT=ssh.service \
+    _SYSTEMD_UNIT=sshd.service \
+    + \
+    _COMM=sudo</code></pre>
+
+<div class="info">
+<strong>journalctl の match セマンティクス</strong>
+<ul>
+  <li>同じフィールドの match: <strong>OR</strong> 結合 (例: <code>_SYSTEMD_UNIT=A _SYSTEMD_UNIT=B</code> = A or B)</li>
+  <li>異なるフィールドの match: <strong>AND</strong> 結合</li>
+  <li><code>+</code> を境にすると左右のグループ全体が <strong>OR</strong> で結ばれる</li>
+  <li><code>+</code> は <code>FIELD=VALUE</code> 同士の間でしか使えない (-u オプションは隣に置けない)</li>
+</ul>
+</div>
+
+<h2 id="parser">ログ行のパース</h2>
+
+<p>
+journalctl が JSON で返してくれる <code>MESSAGE</code> フィールドを正規表現で
+分類します。URSUS は 3 パターンを認識します。
+</p>
+
+<pre><code>RE_ACCEPTED = re.<span class="tk-fn">compile</span>(<span class="tk-str">r'\bAccepted\s+(\S+)\s+for\s+(\S+)\s+from\s+(\S+)'</span>)
+RE_FAILED   = re.<span class="tk-fn">compile</span>(<span class="tk-str">r'\bFailed\s+(\S+)\s+for\s+(?:invalid user\s+)?(\S+)\s+from\s+(\S+)'</span>)
+RE_SUDO     = re.<span class="tk-fn">compile</span>(<span class="tk-str">r'^\s*(\S+)\s+:\s+.*COMMAND=(.+)$'</span>)</code></pre>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>パターン</th><th>マッチ例</th><th>結果</th></tr></thead>
+<tbody>
+<tr>
+  <td>Accepted</td>
+  <td><code>Accepted password for root from 1.2.3.4 port 22 ssh2</code></td>
+  <td>service=sshd, result=success, user=root, source_ip=1.2.3.4</td>
+</tr>
+<tr>
+  <td>Failed</td>
+  <td><code>Failed password for invalid user admin from 1.2.3.4 port 22 ssh2</code></td>
+  <td>service=sshd, result=failure, user=admin, source_ip=1.2.3.4</td>
+</tr>
+<tr>
+  <td>sudo</td>
+  <td><code>parrot : TTY=pts/0 ; PWD=/home ; USER=root ; COMMAND=/usr/bin/cat /etc/shadow</code></td>
+  <td>service=sudo, result=sudo, user=parrot, command=/usr/bin/cat /etc/shadow</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="sudo-hint">sudo を判別する hint</h3>
+
+<p>
+SSH の <code>Accepted</code> / <code>Failed</code> はキーワードで自明に見分けられますが、
+sudo の MESSAGE は <code>parrot : TTY=...</code> のようにユーザー名で始まり、
+プレフィックスから "sudo のログ" だと判別できません。journalctl が一緒に
+返す <code>_COMM</code> フィールド（プロセス名）が <code>sudo</code> のときだけ sudo ルールで
+パースする、という hint 方式を取っています。
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">parse_line</span>(line, service_hint=<span class="tk-kw">None</span>):
+    <span class="tk-kw">if</span> service_hint == <span class="tk-str">"sudo"</span>:
+        m = RE_SUDO.<span class="tk-fn">search</span>(line)
+        ...</code></pre>
+
+<h2 id="code">URSUS の実装</h2>
+
+<p>
+ファイル: <code>src/ursus/sensor/journal_auth_collector.py</code>
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_read_loop</span>(self, conn, proc, stop_event):
+    fd = proc.stdout.<span class="tk-fn">fileno</span>()
+    poller = select.<span class="tk-fn">poll</span>()
+    poller.<span class="tk-fn">register</span>(fd, select.POLLIN | select.POLLHUP | select.POLLERR)
+
+    <span class="tk-kw">while</span> <span class="tk-kw">not</span> stop_event.<span class="tk-fn">is_set</span>():
+        events = poller.<span class="tk-fn">poll</span>(<span class="tk-num">500</span>)  <span class="tk-com"># 500ms は stop_event 確認用</span>
+        <span class="tk-kw">if</span> <span class="tk-kw">not</span> events:
+            <span class="tk-kw">if</span> proc.<span class="tk-fn">poll</span>() <span class="tk-kw">is not</span> <span class="tk-kw">None</span>:
+                <span class="tk-kw">return</span>  <span class="tk-com"># journalctl が早期終了</span>
+            <span class="tk-kw">continue</span>
+        <span class="tk-kw">for</span> _fd, mask <span class="tk-kw">in</span> events:
+            <span class="tk-kw">if</span> mask &amp; select.POLLIN:
+                line = proc.stdout.<span class="tk-fn">readline</span>()
+                self.<span class="tk-fn">_handle_line</span>(conn, line)</code></pre>
+
+<h2 id="output">出力されるイベント</h2>
+
+<h3>raw_json (sshd 失敗の例)</h3>
+<pre><code>{
+  <span class="tk-str">"service"</span>: <span class="tk-str">"sshd"</span>,
+  <span class="tk-str">"result"</span>: <span class="tk-str">"failure"</span>,
+  <span class="tk-str">"method"</span>: <span class="tk-str">"password"</span>,
+  <span class="tk-str">"user"</span>: <span class="tk-str">"root"</span>,
+  <span class="tk-str">"source_ip"</span>: <span class="tk-str">"203.0.113.5"</span>,
+  <span class="tk-str">"raw_line"</span>: <span class="tk-str">"Failed password for root from 203.0.113.5 port 22 ssh2"</span>,
+  <span class="tk-str">"log_source"</span>: <span class="tk-str">"journal"</span>,
+  <span class="tk-str">"_systemd_unit"</span>: <span class="tk-str">"ssh.service"</span>,
+  <span class="tk-str">"_comm"</span>: <span class="tk-str">"sshd"</span>,
+  <span class="tk-str">"_pid"</span>: <span class="tk-str">"12345"</span>,
+  <span class="tk-str">"syslog_identifier"</span>: <span class="tk-str">"sshd"</span>
+}</code></pre>
+
+<h3>非正規化カラム</h3>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>カラム</th><th>値の例</th></tr></thead>
+<tbody>
+<tr><td><code>auth_user</code></td><td><code>root</code></td></tr>
+<tr><td><code>auth_result</code></td><td><code>success</code> / <code>failure</code> / <code>sudo</code></td></tr>
+<tr><td><code>source_ip</code></td><td><code>203.0.113.5</code></td></tr>
+<tr><td><code>process_name</code></td><td><code>sshd</code></td></tr>
+<tr><td><code>cmdline</code></td><td>(sudo の場合) <code>/usr/bin/cat /etc/shadow</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="config">設定</h2>
+
+<pre><code><span class="tk-com">sensor:</span>
+  auth:
+    enabled: <span class="tk-kw">true</span>
+    journal_units:
+      - ssh.service
+      - sshd.service        <span class="tk-com"># Debian/Ubuntu と RHEL の両方をカバー</span>
+    journal_comms:
+      - sudo</code></pre>
+
+<p>
+他のサービス（例: PAM, polkit, GDM のログイン）も追加で取りたい場合は
+<code>journal_units</code> / <code>journal_comms</code> を増やせます。
+</p>
+
+<h2 id="limits">制限</h2>
+
+<ul>
+  <li><strong>journalctl が stdbuf 経由でないとブロックバッファリングする</strong>:
+    URSUS は <code>stdbuf -oL</code> 付きで起動。これにより stdout が行バッファ化され、
+    1 行ずつリアルタイムに届く。</li>
+  <li><strong>非 UTF-8 のログ</strong>: journald は MESSAGE をバイト配列で返すことがある。
+    URSUS は <code>bytes.decode("utf-8", "replace")</code> で救済。</li>
+  <li><strong>正規表現でマッチしないログは捨てる</strong>: 知らないフォーマットの認証ログは
+    記録されない。新しいパターンに遭遇したら <code>parse_line</code> に追加する設計。</li>
+  <li><strong>R006 (時間窓型ルール)</strong>: 「短時間に N 回失敗」のような閾値型検知は
+    現在の DSL では表現できない。condition に <code>time_window</code> を追加する拡張で対応可能。</li>
+</ul>
+
+<h2 id="extensions">拡張余地</h2>
+
+<ul>
+  <li><strong>PAM event 拡張</strong>: ログイン以外 (パスワード変更、アカウント追加) も拾う</li>
+  <li><strong>libsystemd 直接バインド</strong>: subprocess を介さず Python から sd_journal API を直接呼ぶ</li>
+  <li><strong>auditd との統合</strong>: より細かいシステムコール監視</li>
+  <li><strong>時間窓型ルール</strong>: ブルートフォースなどの集計型検知</li>
+</ul>
+
+<h2 id="next">関連ドキュメント</h2>
+<ul>
+  <li><a href="../detector/rules.html#R011">R011 / R012 ルール</a> — auth イベントを使った検知</li>
+  <li><a href="../detector/pipeline.html">Detector Pipeline</a> — auth イベントが評価される流れ</li>
+</ul>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+</article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

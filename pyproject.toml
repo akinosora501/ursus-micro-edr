@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ursus"
+version = "0.1.0"
+description = "Mini EDR for security learners"
+requires-python = ">=3.11"
+dependencies = [
+    "psutil>=5.9",
+    "watchdog>=3.0",
+    "pyyaml>=6.0",
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "jinja2>=3.1",
+    "pydantic>=2.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.5",
+    "mypy>=1.8",
+]
+
+[project.scripts]
+ursus-sensor   = "ursus.sensor.main:run"
+ursus-detector = "ursus.detector.main:run"
+ursus-ui       = "ursus.ui.main:run"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

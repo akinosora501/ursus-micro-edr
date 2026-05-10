@@ -1,0 +1,46 @@
+[Unit]
+Description=URSUS Micro EDR - Sensor
+Documentation=https://github.com/<user>/ursus
+After=network.target systemd-journald.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ursus
+
+# UMask=0007: data/ 配下に作る SQLite WAL/SHM ファイルを root:ursus 660 にする
+# (ui プロセスが ursus グループとして DB を読み書きできるようにするため必須)
+UMask=0007
+
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/ursus/.venv/bin/ursus-sensor --config /opt/ursus/config.yml
+
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=0
+OOMScoreAdjust=-1000
+
+# --- サンドボックス -----------------------------------------------------
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/opt/ursus/data
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+LockPersonality=true
+
+# PrivateTmp=false : /tmp の他プロセス活動を inotify で観測する必要があるため、
+# 専用 /tmp namespace を割り当てる PrivateTmp は使えない。
+PrivateTmp=false
+
+# --- リソース上限 -------------------------------------------------------
+MemoryMax=512M
+TasksMax=200
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

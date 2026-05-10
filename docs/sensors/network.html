@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Network Collector · URSUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="h-full bg-slate-50 antialiased" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue','Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif">
+
+  <div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden"></div>
+
+  <div class="flex min-h-full">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <a href="../index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800 shrink-0 hover:no-underline">
+        <img src="../assets/ursus_logo.png" alt="URSUS" class="h-7 w-auto">
+        <span class="text-white font-bold text-sm tracking-wide">URSUS</span>
+        <span class="ml-auto text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-mono font-semibold">docs</span>
+      </a>
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Getting Started</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../index.html"        class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Introduction</a></li>
+            <li><a href="../quickstart.html"   class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Quick Start</a></li>
+            <li><a href="../architecture.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Architecture</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Sensors</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="process.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Process Collector</a></li>
+            <li><a href="file.html"    class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">File Collector</a></li>
+            <li><a href="network.html" class="block px-3 py-1.5 rounded text-white bg-slate-700 font-medium">Network Collector</a></li>
+            <li><a href="auth.html"    class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Auth Collector</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Detector</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../detector/pipeline.html"  class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Pipeline</a></li>
+            <li><a href="../detector/rules.html"     class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Rules DSL</a></li>
+            <li><a href="../detector/responses.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Responses</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Reference</p>
+          <ul class="space-y-0.5 list-none p-0 m-0">
+            <li><a href="../operations.html" class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Operations</a></li>
+            <li><a href="../glossary.html"   class="block px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Glossary</a></li>
+          </ul>
+        </div>
+      </nav>
+      <div class="px-5 py-3 border-t border-slate-800 shrink-0 text-xs text-slate-500">URSUS · MIT License</div>
+    </aside>
+
+    <div class="flex-1 lg:ml-64 min-h-full flex flex-col">
+      <header class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="p-1.5 rounded-md text-slate-500 hover:bg-slate-100" aria-label="メニュー">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a href="../index.html" class="flex items-center gap-2 text-slate-700 hover:no-underline">
+          <img src="../assets/ursus_logo.png" alt="" class="h-6 w-auto">
+          <span class="font-semibold text-sm">docs</span>
+        </a>
+      </header>
+
+      <main class="flex-1">
+        <div class="max-w-3xl mx-auto px-6 py-10">
+          <article>
+
+<h1><span class="tag-pill network">network</span> Network Collector</h1>
+<p class="subtitle">psutil による TCP 接続テーブル差分ポーリング</p>
+
+<h2 id="goal">目的</h2>
+
+<p>
+攻撃者の通信は以下の典型パターンで観測できます:
+</p>
+
+<ul>
+  <li><strong>新規 LISTEN</strong>: 攻撃者がリバースシェル待ち受け、または不要なポートを開いた</li>
+  <li><strong>新規 ESTABLISHED (outbound)</strong>: マルウェアの C2 通信、データ送信</li>
+  <li><strong>新規 ESTABLISHED (inbound)</strong>: 横展開・攻撃の侵入経路</li>
+</ul>
+
+<p>
+URSUS は <code>psutil.net_connections(kind='tcp')</code> で TCP 接続テーブルの
+スナップショットを取り、前回との差分から「新規」を抽出します。
+</p>
+
+<h2 id="approach">採用方式: psutil 差分ポーリング</h2>
+
+<p>
+他のセンサが kernel push 通知を使うのに対し、network だけは
+<strong>ポーリング</strong>です。これは Linux に「TCP 接続生成の汎用イベント
+ブロードキャスト」が用意されていない歴史的事情によります。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>方式</th><th>取りこぼし</th><th>PID 取得</th><th>備考</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>psutil ポーリング (採用)</strong></td>
+  <td>あり</td>
+  <td>◎</td>
+  <td>2 秒間隔で <code>/proc/net/tcp</code> 系を読む</td>
+</tr>
+<tr>
+  <td>NETLINK_SOCK_DIAG</td>
+  <td>同上</td>
+  <td>◎</td>
+  <td><code>ss(8)</code> が使う API。生成イベントは取れない</td>
+</tr>
+<tr>
+  <td>NETLINK_NETFILTER (conntrack)</td>
+  <td>なし（イベント駆動）</td>
+  <td>✗</td>
+  <td>conntrack は kernel 側のエントリを通知。PID は取れない</td>
+</tr>
+<tr>
+  <td>NETLINK_AUDIT</td>
+  <td>なし</td>
+  <td>◎</td>
+  <td><code>auditctl -S connect -S accept</code>。auditd と排他</td>
+</tr>
+<tr>
+  <td>eBPF (kprobe)</td>
+  <td>なし</td>
+  <td>◎ + 親プロセス</td>
+  <td><code>tcp_v4_connect</code>, <code>inet_csk_accept</code>。商用 EDR 標準</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="warn">
+<strong>取りこぼしを許容している</strong>
+<p>
+ポーリング間隔（既定 2 秒）より短命な接続は検知できません。<code>curl http://...</code>
+が 1 秒以内に閉じる接続は見えないことがあります。
+差分ポーリング方式に固有の制限。eBPF (kprobe <code>tcp_v4_connect</code> /
+<code>inet_csk_accept</code>) に置き換えれば解消する。
+</p>
+</div>
+
+<h2 id="how">差分検出のしくみ</h2>
+
+<div class="diagram">
+<pre>
+   poll cycle N        poll cycle N+1
+   ─────────────       ──────────────
+   {A, B, C, D}        {A, B, C, E, F}     ← 現在のスナップショット
+
+                        new = current - known
+                        new = {E, F}        ← イベント化対象
+
+   _known = {A, B, C, D}  →  _known = {A, B, C, E, F}
+</pre>
+<p class="diagram-caption">起動時の既存接続をベースラインとし、以降のポーリング差分のみを記録</p>
+</div>
+
+<h3 id="conn-key">接続を識別するキー</h3>
+
+<p>
+ある接続が「新規かどうか」を判定するには、識別キーが必要です。URSUS は
+4-tuple + status + pid を使います。
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_conn_key</span>(sc):
+    laddr = (sc.laddr.ip, sc.laddr.port) <span class="tk-kw">if</span> sc.laddr <span class="tk-kw">else</span> <span class="tk-kw">None</span>
+    raddr = (sc.raddr.ip, sc.raddr.port) <span class="tk-kw">if</span> sc.raddr <span class="tk-kw">else</span> <span class="tk-kw">None</span>
+    <span class="tk-kw">return</span> (laddr, raddr, sc.status, sc.pid)</code></pre>
+
+<p>
+<code>status</code> を含めることで、同じ接続が <code>SYN_SENT → ESTABLISHED</code> と
+状態遷移したときに「新しい ESTABLISHED」として正しく検出されます。
+</p>
+
+<h3 id="states">記録対象の状態</h3>
+
+<p>
+TCP の状態は 11 種類ありますが、URSUS は <strong>LISTEN と ESTABLISHED のみ</strong>を
+記録対象にしています。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>状態</th><th>意味</th><th>記録</th></tr></thead>
+<tbody>
+<tr><td><code>LISTEN</code></td><td>サーバが接続待ち</td><td>◯</td></tr>
+<tr><td><code>SYN_SENT</code></td><td>クライアントが接続要求送信中</td><td>✗ ESTABLISHED に進んだら拾う</td></tr>
+<tr><td><code>SYN_RECV</code></td><td>サーバが SYN 受信、SYN+ACK 返した</td><td>✗ 同上</td></tr>
+<tr><td><code>ESTABLISHED</code></td><td>接続確立中（双方向通信可能）</td><td>◯</td></tr>
+<tr><td><code>TIME_WAIT</code></td><td>クローズ後の待機</td><td>✗ 高頻度ノイズ</td></tr>
+<tr><td><code>CLOSE_WAIT</code> ほか</td><td>遷移状態</td><td>✗</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="debounce">ESTABLISHED の重複抑制</h2>
+
+<p>
+HTTP/2 connection pool やメッセンジャーアプリの再接続では、同じプロセスが
+同じ宛先 IP:Port に対して短時間に多数の接続を開閉します。ephemeral port が
+毎回違うため 4-tuple は全て異なりますが、検知の観点ではノイズです。
+</p>
+
+<p>
+URSUS は <code>(pid, remote_ip, remote_port)</code> をキーに、
+<code>established_debounce_sec</code> 窓内の重複を破棄します。LISTEN は
+低頻度かつ高シグナルなので debounce 対象外です。
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">_should_emit</span>(self, sc):
+    <span class="tk-kw">if</span> sc.status != <span class="tk-str">"ESTABLISHED"</span>: <span class="tk-kw">return</span> <span class="tk-kw">True</span>
+    <span class="tk-kw">if</span> self.established_debounce_sec &lt;= <span class="tk-num">0</span>: <span class="tk-kw">return</span> <span class="tk-kw">True</span>
+    <span class="tk-kw">if</span> <span class="tk-kw">not</span> sc.raddr: <span class="tk-kw">return</span> <span class="tk-kw">True</span>
+    key = (sc.pid, sc.raddr.ip, sc.raddr.port)
+    now = time.<span class="tk-fn">monotonic</span>()
+    last = self._last_established_emit.<span class="tk-fn">get</span>(key)
+    <span class="tk-kw">if</span> last <span class="tk-kw">is not</span> <span class="tk-kw">None</span> <span class="tk-kw">and</span> now - last &lt; self.established_debounce_sec:
+        <span class="tk-kw">return</span> <span class="tk-kw">False</span>
+    self._last_established_emit[key] = now
+    <span class="tk-kw">return</span> <span class="tk-kw">True</span></code></pre>
+
+<h2 id="code">URSUS の実装</h2>
+
+<p>
+ファイル: <code>src/ursus/sensor/network_collector.py</code>
+</p>
+
+<pre><code><span class="tk-kw">def</span> <span class="tk-fn">run</span>(self, stop_event):
+    conn = <span class="tk-fn">get_connection</span>(self.db_path)
+    <span class="tk-com"># 起動時の既存接続はベースラインとして黙って取り込む</span>
+    self._known = self.<span class="tk-fn">_snapshot_keys</span>()
+
+    <span class="tk-kw">while</span> <span class="tk-kw">not</span> stop_event.<span class="tk-fn">is_set</span>():
+        <span class="tk-kw">if</span> stop_event.<span class="tk-fn">wait</span>(self.poll_interval):
+            <span class="tk-kw">break</span>
+
+        snapshot = psutil.<span class="tk-fn">net_connections</span>(kind=<span class="tk-str">"tcp"</span>)
+        current = <span class="tk-fn">set</span>()
+        new_conns = []
+        <span class="tk-kw">for</span> sc <span class="tk-kw">in</span> snapshot:
+            <span class="tk-kw">if</span> sc.status <span class="tk-kw">not</span> <span class="tk-kw">in</span> _TRACKED_STATES:
+                <span class="tk-kw">continue</span>
+            key = <span class="tk-fn">_conn_key</span>(sc)
+            current.<span class="tk-fn">add</span>(key)
+            <span class="tk-kw">if</span> key <span class="tk-kw">not</span> <span class="tk-kw">in</span> self._known:
+                new_conns.<span class="tk-fn">append</span>(sc)
+
+        <span class="tk-kw">for</span> sc <span class="tk-kw">in</span> new_conns:
+            <span class="tk-kw">if</span> <span class="tk-kw">not</span> self.<span class="tk-fn">_should_emit</span>(sc):  <span class="tk-com"># debounce</span>
+                <span class="tk-kw">continue</span>
+            self.<span class="tk-fn">_record</span>(conn, sc)
+
+        self._known = current
+        self.<span class="tk-fn">_gc_debounce</span>()</code></pre>
+
+<h2 id="output">出力されるイベント</h2>
+
+<h3>raw_json</h3>
+<pre><code>{
+  <span class="tk-str">"fd"</span>: <span class="tk-num">5</span>,
+  <span class="tk-str">"family"</span>: <span class="tk-str">"AF_INET"</span>,
+  <span class="tk-str">"type"</span>: <span class="tk-str">"SOCK_STREAM"</span>,
+  <span class="tk-str">"laddr"</span>: [<span class="tk-str">"0.0.0.0"</span>, <span class="tk-num">8080</span>],
+  <span class="tk-str">"raddr"</span>: [<span class="tk-str">"192.0.2.10"</span>, <span class="tk-num">54321</span>],
+  <span class="tk-str">"status"</span>: <span class="tk-str">"ESTABLISHED"</span>,
+  <span class="tk-str">"pid"</span>: <span class="tk-num">4567</span>,
+  <span class="tk-str">"process_name"</span>: <span class="tk-str">"python3"</span>
+}</code></pre>
+
+<h3>非正規化カラム</h3>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>カラム</th><th>例 (ESTABLISHED)</th><th>例 (LISTEN)</th></tr></thead>
+<tbody>
+<tr><td><code>pid</code></td><td><code>4567</code></td><td><code>999</code></td></tr>
+<tr><td><code>process_name</code></td><td><code>python3</code></td><td><code>sshd</code></td></tr>
+<tr><td><code>local_port</code></td><td><code>54321</code></td><td><code>22</code></td></tr>
+<tr><td><code>remote_addr</code></td><td><code>192.0.2.10</code></td><td><code>NULL</code></td></tr>
+<tr><td><code>remote_port</code></td><td><code>54321</code></td><td><code>NULL</code></td></tr>
+<tr><td><code>conn_state</code></td><td><code>ESTABLISHED</code></td><td><code>LISTEN</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="info">
+<strong>LISTEN は raddr が NULL</strong>
+<p>
+LISTEN ソケットは「待ち受けているだけで誰とも繋がっていない」ので
+remote_addr / remote_port が NULL になります。UI の Detail 列は LISTEN
+だったら laddr を表示するように分岐しています。
+</p>
+</div>
+
+<h2 id="config">設定</h2>
+
+<pre><code><span class="tk-com">sensor:</span>
+  network:
+    enabled: <span class="tk-kw">true</span>
+    poll_interval_sec: <span class="tk-num">2.0</span>
+    established_debounce_sec: <span class="tk-num">5.0</span>   <span class="tk-com"># 0 で無効化</span></code></pre>
+
+<h2 id="limits">制限</h2>
+
+<ul>
+  <li><strong>UDP は対象外</strong>: DNS (53) / NTP (123) / QUIC は見えない</li>
+  <li><strong>ICMP も対象外</strong>: ping / traceroute は記録されない</li>
+  <li><strong>ペイロード非観測</strong>: 4-tuple のみ。HTTP リクエスト本体や TLS SNI は見えない</li>
+  <li><strong>取りこぼし</strong>: poll 間隔より短命な接続</li>
+</ul>
+
+<h2 id="dns">DNS を観測したい場合</h2>
+
+<p>
+URSUS の現在の実装では DNS クエリは取れません。観測する場合の選択肢:
+</p>
+
+<ol>
+  <li><strong>パケットキャプチャ</strong>: <code>scapy</code> / <code>pyshark</code> で UDP/53 を直接観察</li>
+  <li><strong>systemd-resolved のログ</strong>: <code>journalctl -u systemd-resolved</code> で DNS 解決ログ。auth_collector と同じ journalctl パターンで実装可能</li>
+  <li><strong>eBPF</strong>: <code>udp_sendmsg</code> kprobe で UDP/53 をフック</li>
+  <li><strong>DNS resolver ホスト化</strong>: dnsmasq などを挟んでログ取得</li>
+</ol>
+
+<p>
+商用 EDR は概ね eBPF + パケットキャプチャの併用です。
+</p>
+
+<h2 id="next">関連ドキュメント</h2>
+<ul>
+  <li><a href="auth.html">Auth Collector</a> — journalctl パターンの先行実装</li>
+  <li><a href="../detector/rules.html">Rules DSL</a> — network イベントを使ったルール例</li>
+</ul>
+
+<footer class="docs-footer">
+  <span>URSUS Micro EDR · MIT License</span>
+  <span>
+    <a href="https://github.com/akinosora501/ursus-micro-edr" target="_blank" rel="noopener">GitHub</a>
+  </span>
+</footer>
+</article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('overlay').classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('overlay').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

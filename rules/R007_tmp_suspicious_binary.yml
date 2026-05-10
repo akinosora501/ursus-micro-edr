@@ -1,0 +1,17 @@
+id: R007
+title: /var/tmp 配下への不審なバイナリ・ツールのコピー
+description: 攻撃者が /var/tmp 配下にネットキャットやシェル、ペイロード等のツールをコピー・作成する挙動を検知します。
+severity: high
+event_type: file
+condition:
+  all:
+    - field: file_path
+      op: regex
+      value: "^/var/tmp/(nc|ncat|netcat|bash|sh|socat|payload|backdoor)$"
+    - field: file_op
+      op: in
+      value: [create, modify, move]
+response:
+  - alert
+mitre:
+  - T1105

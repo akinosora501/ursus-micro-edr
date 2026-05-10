@@ -1,0 +1,17 @@
+id: R002
+title: スクリプト言語によるインタラクティブシェルの起動 (pty.spawn)
+description: Pythonなどのスクリプト言語を用いて、インタラクティブなシェル（リバースシェルなど）をスポーンする挙動を検知します。
+severity: high
+event_type: process
+condition:
+  all:
+    - field: process_name
+      op: in
+      value: [python, python2, python3]
+    - field: cmdline
+      op: regex
+      value: "import\\s+pty"
+response:
+  - alert
+mitre:
+  - T1059.006

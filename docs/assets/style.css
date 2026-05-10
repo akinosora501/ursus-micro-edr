@@ -1,0 +1,183 @@
+/* URSUS docs — custom styles (used alongside Tailwind CDN)
+ * All prose rules are scoped to <article> to avoid Tailwind Preflight conflicts.
+ */
+
+/* ── Article prose ───────────────────────────────────────────────── */
+article h1 {
+  font-size: 1.875rem; font-weight: 800; color: #0f172a;
+  margin: 0 0 0.375rem; line-height: 1.2;
+}
+article .subtitle {
+  color: #64748b; font-size: 1.05rem;
+  margin-top: 0.25rem; margin-bottom: 2rem; line-height: 1.6;
+}
+article h2 {
+  font-size: 1.25rem; font-weight: 700; color: #1e293b;
+  margin: 2.5rem 0 0.75rem; padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+article h3 {
+  font-size: 1rem; font-weight: 600; color: #334155;
+  margin: 1.75rem 0 0.5rem;
+}
+article h4 {
+  font-size: 0.9375rem; font-weight: 600; color: #475569;
+  margin: 1.5rem 0 0.375rem;
+}
+article p  { color: #475569; line-height: 1.8; margin: 0.75rem 0; }
+article ul { color: #475569; line-height: 1.8; margin: 0.75rem 0; padding-left: 1.5rem; list-style: disc; }
+article ol { color: #475569; line-height: 1.8; margin: 0.75rem 0; padding-left: 1.5rem; list-style: decimal; }
+article li { margin: 0.35rem 0; }
+article strong { color: #1e293b; font-weight: 600; }
+article a  { color: #0369a1; text-underline-offset: 2px; }
+article a:hover { color: #0284c7; }
+article kbd {
+  background: #f1f5f9; border: 1px solid #cbd5e1; border-bottom: 2px solid #94a3b8;
+  border-radius: 0.3rem; padding: 0.1em 0.4em; font-size: 0.8em;
+  font-family: ui-monospace, Menlo, monospace; color: #374151;
+}
+
+/* ── Inline code ─────────────────────────────────────────────────── */
+article code:not(pre code) {
+  background: #f1f5f9; color: #0f172a;
+  padding: 0.15em 0.4em; border-radius: 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875em; border: 1px solid #e2e8f0;
+}
+
+/* ── Code blocks ─────────────────────────────────────────────────── */
+article pre {
+  background: #0f172a; color: #e2e8f0;
+  border-radius: 0.5rem; padding: 1.25rem 1.5rem;
+  overflow-x: auto; margin: 1.25rem 0;
+  font-size: 0.8125rem; line-height: 1.7;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+article pre code { background: none; border: none; color: inherit; padding: 0; font-size: inherit; }
+
+/* ── Syntax highlighting tokens ──────────────────────────────────── */
+.tk-kw  { color: #c792ea; }
+.tk-fn  { color: #82aaff; }
+.tk-str { color: #c3e88d; }
+.tk-num { color: #f78c6c; }
+.tk-com { color: #697b8c; font-style: italic; }
+.tk-typ { color: #ffcb6b; }
+
+/* ── Tables ──────────────────────────────────────────────────────── */
+.tbl-wrap {
+  overflow-x: auto; margin: 1.25rem 0;
+  border-radius: 0.5rem; border: 1px solid #e2e8f0;
+}
+article table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+article thead th {
+  background: #f8fafc; padding: 0.625rem 0.75rem; text-align: left;
+  font-size: 0.75rem; font-weight: 600; color: #64748b;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 2px solid #e2e8f0; white-space: nowrap;
+}
+article tbody td {
+  padding: 0.625rem 0.75rem; border-bottom: 1px solid #f1f5f9;
+  vertical-align: top; color: #374151;
+}
+article tbody tr:last-child td { border-bottom: none; }
+article tbody tr:hover  { background: #f8fafc; }
+article td code { font-size: 0.8125rem; }
+
+/* ── Definition lists ────────────────────────────────────────────── */
+article dl { margin: 1rem 0; }
+article dt { font-weight: 700; color: #1e293b; margin-top: 1.5rem; font-size: 0.9375rem; }
+article dt:first-child { margin-top: 0; }
+article dd {
+  color: #475569; line-height: 1.8;
+  margin: 0.25rem 0 0.75rem 0; padding-left: 1rem;
+  border-left: 3px solid #e2e8f0;
+}
+
+/* ── Event type tag pills ────────────────────────────────────────── */
+.tag-pill {
+  display: inline-flex; align-items: center;
+  padding: 0.125rem 0.5rem; border-radius: 0.25rem;
+  font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  vertical-align: middle; margin-right: 0.25rem;
+}
+.tag-pill.process { background: #dbeafe; color: #1e40af; }
+.tag-pill.file    { background: #d1fae5; color: #065f46; }
+.tag-pill.network { background: #ede9fe; color: #5b21b6; }
+.tag-pill.auth    { background: #fef3c7; color: #78350f; }
+
+/* ── Diagrams ────────────────────────────────────────────────────── */
+.diagram {
+  background: #0f172a; border-radius: 0.5rem;
+  padding: 1.25rem 1.5rem; margin: 1.5rem 0; overflow-x: auto;
+}
+.diagram pre {
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem; line-height: 1.65; margin: 0; white-space: pre;
+}
+.diagram-caption {
+  color: #64748b; font-size: 0.75rem;
+  margin-top: 0.75rem; text-align: center; font-style: italic;
+}
+
+/* ── Callout boxes ───────────────────────────────────────────────── */
+:is(.warn, .info, .tip, .ok, .note, .danger) {
+  border-radius: 0.5rem; padding: 1rem 1.25rem;
+  margin: 1.5rem 0; font-size: 0.875rem; line-height: 1.75;
+}
+:is(.warn, .info, .tip, .ok, .note, .danger) > strong:first-child {
+  display: block; font-weight: 700; margin-bottom: 0.5rem; font-size: 0.9rem;
+}
+:is(.warn, .info, .tip, .ok, .note, .danger) p  { margin: 0.4rem 0; line-height: 1.75; }
+:is(.warn, .info, .tip, .ok, .note, .danger) ul,
+:is(.warn, .info, .tip, .ok, .note, .danger) ol  { padding-left: 1.25rem; margin: 0.4rem 0; list-style: disc; }
+:is(.warn, .info, .tip, .ok, .note, .danger) ol  { list-style: decimal; }
+:is(.warn, .info, .tip, .ok, .note, .danger) li  { margin: 0.2rem 0; }
+:is(.warn, .info, .tip, .ok, .note, .danger) code {
+  background: rgba(0,0,0,0.08); border-radius: 0.2rem;
+  padding: 0.1em 0.35em; font-size: 0.875em; border: none;
+}
+:is(.warn, .info, .tip, .ok, .note, .danger) pre {
+  border-radius: 0.375rem; padding: 0.75rem 1rem; margin: 0.5rem 0;
+}
+.warn   { background: #fffbeb; border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; color: #78350f; }
+.info   { background: #eff6ff; border: 1px solid #93c5fd; border-left: 4px solid #3b82f6; color: #1e3a5f; }
+.tip    { background: #f0fdf4; border: 1px solid #86efac; border-left: 4px solid #22c55e; color: #14532d; }
+.ok     { background: #f0fdf4; border: 1px solid #86efac; border-left: 4px solid #22c55e; color: #14532d; }
+.note   { background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #94a3b8; color: #334155; }
+.danger { background: #fef2f2; border: 1px solid #fca5a5; border-left: 4px solid #ef4444; color: #7f1d1d; }
+
+/* ── Feature cards ───────────────────────────────────────────────── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem; margin: 1.5rem 0;
+}
+.card {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 0.625rem;
+  padding: 1.25rem 1.5rem; text-decoration: none; color: inherit;
+  transition: box-shadow 0.15s, border-color 0.15s; display: block;
+}
+a.card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-color: #7dd3fc;
+  text-decoration: none;
+}
+.card h3 { font-size: 0.9375rem; font-weight: 700; color: #0f172a; margin: 0 0 0.5rem; }
+.card p  { font-size: 0.875rem; color: #64748b; line-height: 1.7; margin: 0; }
+
+
+/* ── Page footer ─────────────────────────────────────────────────── */
+.docs-footer {
+  margin-top: 3rem; padding: 1.5rem 0;
+  border-top: 1px solid #e2e8f0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.8125rem; color: #94a3b8;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.docs-footer a { color: #64748b; text-decoration: none; }
+.docs-footer a:hover { color: #0284c7; text-decoration: underline; }
+
+/* ── Smooth anchor scroll ────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+:target { scroll-margin-top: 2rem; }
